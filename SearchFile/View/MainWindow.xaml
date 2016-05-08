@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SearchFile"
         mc:Ignorable="d"
+        DataContext="{Binding Main, Source={StaticResource Locator}}"
         Title="ファイルの検索">
     <Window.Resources>
         <ResourceDictionary>
@@ -91,12 +92,12 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <ListView Grid.RowSpan="3">
+            <ListView Grid.RowSpan="3" ItemsSource="{Binding Searcher.Results}">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="ファイル名"/>
-                        <GridViewColumn Header="拡張子"/>
-                        <GridViewColumn Header="ディレクトリ"/>
+                        <GridViewColumn Header="ファイル名" DisplayMemberBinding="{Binding FileName}"/>
+                        <GridViewColumn Header="拡張子" DisplayMemberBinding="{Binding Extension}"/>
+                        <GridViewColumn Header="ディレクトリ" DisplayMemberBinding="{Binding DirectoryName}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
@@ -114,16 +115,16 @@
                         </TextBlock>
                     </Border>
                     <TextBlock Text="ディレクトリ名" Margin="8,8,8,0"/>
-                    <TextBox Margin="8,0"/>
+                    <TextBox Margin="8,0" Text="{Binding Condition.TargetDirectory}"/>
                     <Button Content="ディレクトリの選択" Margin="8" HorizontalAlignment="Right"/>
                     <TextBlock Text="ファイル名" Margin="8,0"/>
-                    <TextBox Margin="8,0,8,8"/>
+                    <TextBox Margin="8,0,8,8" Text="{Binding Condition.FileName}"/>
                     <StackPanel Orientation="Horizontal" Margin="8,0" HorizontalAlignment="Center">
                         <RadioButton Content="ワイルドカード" Margin="8,0" HorizontalAlignment="Center"/>
                         <RadioButton Content="正規表現" Margin="8,0" HorizontalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="8,16,8,0" HorizontalAlignment="Right">
-                        <Button Content="検索開始" IsDefault="True"/>
+                        <Button Content="検索開始" IsDefault="True" Command="{Binding SearchCommand}"/>
                         <Button Content="リストのクリア" Margin="8,0,0,0"/>
                     </StackPanel>
                 </StackPanel>
