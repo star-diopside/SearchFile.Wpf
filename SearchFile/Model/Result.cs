@@ -28,11 +28,14 @@ namespace SearchFile.Model
         {
         }
 
-        public Result(string path)
+        public static Result Of(string path)
         {
-            this.DirectoryName = Path.GetDirectoryName(path);
-            this.FileName = Path.GetFileName(path);
-            this.Extension = Path.GetExtension(path);
+            return new Result()
+            {
+                DirectoryName = Path.GetDirectoryName(path),
+                FileName = Path.GetFileName(path),
+                Extension = Path.GetExtension(path)
+            };
         }
     }
 }
