@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using CsvHelper;
+using NLog;
 using PropertyChanged;
 using SearchFile.Properties;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -95,6 +97,49 @@ namespace SearchFile.Model
         {
             this.Results.Clear();
             this.Status = Resources.ClearResultsMessage;
+        }
+
+        public void Save(string fileName)
+        {
+            switch (Path.GetExtension(fileName).ToLower())
+            {
+                case ".csv":
+                    SaveCsv(fileName);
+                    break;
+                default:
+                    SaveText(fileName);
+                    break;
+            }
+        }
+
+        private void SaveCsv(string fileName)
+        {
+            using (var writer = new CsvWriter(new StreamWriter(fileName, false, Encoding.UTF8)))
+            {
+                writer.WriteField("DirectoryName");
+                writer.WriteField("FileName");
+                writer.WriteField("Extension");
+                writer.NextRecord();
+
+                foreach (var result in this.Results)
+                {
+                    writer.WriteField(result.DirectoryName);
+                    writer.WriteField(result.FileName);
+                    writer.WriteField(result.Extension);
+                    writer.NextRecord();
+                }
+            }
+        }
+
+        private void SaveText(string fileName)
+        {
+            using (var writer = new StreamWriter(fileName, false, Encoding.UTF8))
+            {
+                foreach (var result in this.Results)
+                {
+                    writer.WriteLine(result.FilePath);
+                }
+            }
         }
 
         public void SetError(Exception ex)

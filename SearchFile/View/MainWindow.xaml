@@ -33,6 +33,9 @@
         <trigger:ChooseFolderTrigger>
             <action:ChooseFolderAction/>
         </trigger:ChooseFolderTrigger>
+        <trigger:SaveFileTrigger>
+            <action:SaveFileAction/>
+        </trigger:SaveFileTrigger>
     </i:Interaction.Triggers>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -48,7 +51,7 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Header="名前を付けて保存(_A)...">
+                <MenuItem Header="名前を付けて保存(_A)..." Command="{Binding SaveResultsCommand}">
                     <MenuItem.Icon>
                         <Rectangle Width="16" Height="16" Fill="{StaticResource SaveAsIcon}"/>
                     </MenuItem.Icon>
@@ -81,7 +84,7 @@
                 <Button Command="{Binding ChooseFolderCommand}">
                     <Rectangle Width="16" Height="16" Fill="{StaticResource OpenFolderIcon}"/>
                 </Button>
-                <Button>
+                <Button Command="{Binding SaveResultsCommand}">
                     <Rectangle Width="16" Height="16" Fill="{StaticResource SaveAsIcon}"/>
                 </Button>
                 <Separator/>
@@ -137,10 +140,10 @@
                         </TextBlock>
                     </Border>
                     <TextBlock Text="ディレクトリ名" Margin="8,8,8,0"/>
-                    <TextBox Margin="8,0" Text="{Binding Condition.TargetDirectory}"/>
+                    <TextBox Margin="8,0" Text="{Binding Condition.TargetDirectory, UpdateSourceTrigger=PropertyChanged}"/>
                     <Button Content="ディレクトリの選択" Margin="8" HorizontalAlignment="Right" Command="{Binding ChooseFolderCommand}"/>
                     <TextBlock Text="ファイル名" Margin="8,0"/>
-                    <TextBox Margin="8,0,8,8" Text="{Binding Condition.FileName}"/>
+                    <TextBox Margin="8,0,8,8" Text="{Binding Condition.FileName, UpdateSourceTrigger=PropertyChanged}"/>
                     <StackPanel Orientation="Horizontal" Margin="8,0" HorizontalAlignment="Center">
                         <RadioButton Content="ワイルドカード" Margin="8,0" HorizontalAlignment="Center" IsChecked="{Binding Condition.MatchType, ConverterParameter=Wildcard, Converter={StaticResource EnumBooleanConverter}}"/>
                         <RadioButton Content="正規表現" Margin="8,0" HorizontalAlignment="Center" IsChecked="{Binding Condition.MatchType, ConverterParameter=Regex, Converter={StaticResource EnumBooleanConverter}}"/>

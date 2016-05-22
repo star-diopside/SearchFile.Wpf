@@ -10,32 +10,28 @@ namespace SearchFile.Model
     public class Result
     {
         /// <summary>
-        /// ファイル名
+        /// ファイル名を取得または設定する。
         /// </summary>
-        public string FileName { get; set; }
+        public string FileName => Path.GetFileName(this.FilePath);
 
         /// <summary>
-        /// 拡張子
+        /// 拡張子を取得または設定する。
         /// </summary>
-        public string Extension { get; set; }
+        public string Extension => Path.GetExtension(this.FilePath);
 
         /// <summary>
-        /// ディレクトリ名
+        /// ディレクトリ名を取得または設定する。
         /// </summary>
-        public string DirectoryName { get; set; }
+        public string DirectoryName => Path.GetDirectoryName(this.FilePath);
 
-        public Result()
-        {
-        }
+        /// <summary>
+        /// ファイルパスを取得または設定する。
+        /// </summary>
+        public string FilePath { get; set; }
 
         public static Result Of(string path)
         {
-            return new Result()
-            {
-                DirectoryName = Path.GetDirectoryName(path),
-                FileName = Path.GetFileName(path),
-                Extension = Path.GetExtension(path)
-            };
+            return new Result() { FilePath = path };
         }
     }
 }

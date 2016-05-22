@@ -40,6 +40,10 @@
     <ApplicationManifest>App.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CsvHelper, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\packages\CsvHelper.2.14.2\lib\net45\CsvHelper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="GalaSoft.MvvmLight, Version=5.3.0.19026, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
       <Private>True</Private>
@@ -74,10 +78,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -98,12 +99,15 @@
     </ApplicationDefinition>
     <Compile Include="Messaging\ChooseFolderMessage.cs" />
     <Compile Include="Messaging\ExceptionMessage.cs" />
+    <Compile Include="Messaging\SaveFileMessage.cs" />
     <Compile Include="View\Action\ChooseFolderAction.cs" />
     <Compile Include="View\Action\ExceptionAction.cs" />
+    <Compile Include="View\Action\SaveFileAction.cs" />
     <Compile Include="View\Action\WindowCloseAction.cs" />
     <Compile Include="View\Converter\EnumBooleanConverter.cs" />
     <Compile Include="View\Trigger\ChooseFolderTrigger.cs" />
     <Compile Include="View\Trigger\ExceptionTrigger.cs" />
+    <Compile Include="View\Trigger\SaveFileTrigger.cs" />
     <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
