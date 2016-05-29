@@ -1,4 +1,5 @@
-﻿using Prism.Modularity;
+﻿using Microsoft.Practices.Unity;
+using Prism.Modularity;
 using Prism.Regions;
 using SearchFile.Views;
 
@@ -6,16 +7,12 @@ namespace SearchFile
 {
     public class SearchFileModule : IModule
     {
-        private IRegionManager regionManager;
-
-        public SearchFileModule(IRegionManager regionManager)
-        {
-            this.regionManager = regionManager;
-        }
+        [Dependency]
+        public IRegionManager RegionManager { private get; set; }
 
         public void Initialize()
         {
-            this.regionManager.RegisterViewWithRegion("MainRegion", typeof(SearchFileControl));
+            this.RegionManager.RegisterViewWithRegion("MainRegion", typeof(SearchFileView));
         }
     }
 }
