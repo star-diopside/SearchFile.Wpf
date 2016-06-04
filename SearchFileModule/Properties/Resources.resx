@@ -120,6 +120,9 @@
   <data name="ClearResultsMessage" xml:space="preserve">
     <value>検索結果をクリアしました。</value>
   </data>
+  <data name="CopyFileNameMessage" xml:space="preserve">
+    <value>{0} 個のファイル名をコピーしました。</value>
+  </data>
   <data name="DirectoryNotFoundMessage" xml:space="preserve">
     <value>ディレクトリが存在しません。</value>
   </data>

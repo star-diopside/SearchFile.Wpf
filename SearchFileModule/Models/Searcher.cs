@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using NLog;
+using Prism.Mvvm;
 using PropertyChanged;
 using SearchFileModule.Properties;
 using System;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 namespace SearchFile.Models
 {
     [ImplementPropertyChanged]
-    public class Searcher
+    public class Searcher : BindableBase
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -24,7 +25,14 @@ namespace SearchFile.Models
 
         public bool IsSearching => this.CancellationTokenSource != null;
 
+        public bool ExistsResults => this.Results.Any();
+
         private CancellationTokenSource CancellationTokenSource { get; set; }
+
+        public Searcher()
+        {
+            this.Results.CollectionChanged += (s, e) => this.OnPropertyChanged(nameof(ExistsResults));
+        }
 
         public async Task Search(Condition condition)
         {
@@ -140,11 +148,6 @@ namespace SearchFile.Models
                     writer.WriteLine(result.FilePath);
                 }
             }
-        }
-
-        public void SetError(Exception ex)
-        {
-            this.Status = Resources.SearchingErrorMessage;
         }
     }
 }

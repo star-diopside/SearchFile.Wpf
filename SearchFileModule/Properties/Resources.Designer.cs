@@ -70,6 +70,15 @@ namespace SearchFileModule.Properties {
         }
         
         /// <summary>
+        ///   {0} 個のファイル名をコピーしました。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string CopyFileNameMessage {
+            get {
+                return ResourceManager.GetString("CopyFileNameMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   ディレクトリが存在しません。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string DirectoryNotFoundMessage {

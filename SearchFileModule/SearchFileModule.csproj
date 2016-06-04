@@ -113,6 +113,7 @@
     <Compile Include="Views\Action\ExceptionAction.cs" />
     <Compile Include="Views\Action\SaveFileAction.cs" />
     <Compile Include="Views\Action\WindowCloseAction.cs" />
+    <Compile Include="Views\Converter\BooleanNegationConverter.cs" />
     <Compile Include="Views\Converter\EnumBooleanConverter.cs" />
     <Compile Include="Views\SearchFileView.xaml.cs">
       <DependentUpon>SearchFileView.xaml</DependentUpon>

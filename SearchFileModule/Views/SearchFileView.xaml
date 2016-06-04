@@ -23,6 +23,14 @@
                 <Setter Property="ToolTip" Value="{Binding (Validation.Errors)/ErrorContent, RelativeSource={RelativeSource Self}}"/>
             </Style>
             <Style TargetType="Menu" BasedOn="{StaticResource {x:Static ToolBar.MenuStyleKey}}"/>
+            <Style x:Key="IconStyle" TargetType="Rectangle">
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.5"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <converter:BooleanNegationConverter x:Key="BooleanNegationConverter"/>
             <converter:EnumBooleanConverter x:Key="EnumBooleanConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -40,20 +48,20 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="ファイル(_F)">
-                <MenuItem Header="リストのクリア(_C)" Command="{Binding ClearResultsCommand, Mode=OneWay}">
+                <MenuItem Header="リストのクリア(_C)" Command="{Binding ClearResultsCommand, Mode=OneWay}" IsEnabled="{Binding Searcher.ExistsResults, Converter={StaticResource BooleanNegationConverter}, Mode=OneWay}">
                     <MenuItem.Icon>
-                        <Rectangle Width="16" Height="16" Fill="{StaticResource NewFileIcon}"/>
+                        <Rectangle Style="{StaticResource IconStyle}" Width="16" Height="16" Fill="{StaticResource NewFileIcon}"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="ディレクトリの選択(_S)..." Command="{Binding ChooseFolderCommand, Mode=OneWay}">
                     <MenuItem.Icon>
-                        <Rectangle Width="16" Height="16" Fill="{StaticResource OpenFolderIcon}"/>
+                        <Rectangle Style="{StaticResource IconStyle}" Width="16" Height="16" Fill="{StaticResource OpenFolderIcon}"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="名前を付けて保存(_A)..." Command="{Binding SaveResultsCommand, Mode=OneWay}">
                     <MenuItem.Icon>
-                        <Rectangle Width="16" Height="16" Fill="{StaticResource SaveAsIcon}"/>
+                        <Rectangle Style="{StaticResource IconStyle}" Width="16" Height="16" Fill="{StaticResource SaveAsIcon}"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
@@ -66,45 +74,47 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="編集(_E)">
-                <MenuItem Header="検索結果をコピー(_C)">
+                <MenuItem Header="検索結果をコピー(_C)" Command="{Binding CopyResultsCommand, Mode=OneWay}" IsEnabled="{Binding Searcher.ExistsResults, Mode=OneWay}">
                     <MenuItem.Icon>
-                        <Rectangle Width="16" Height="16" Fill="{StaticResource CopyIcon}"/>
+                        <Rectangle Style="{StaticResource IconStyle}" Width="16" Height="16" Fill="{StaticResource CopyIcon}"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Header="すべて選択(_A)"/>
-                <MenuItem Header="選択の切り替え(_R)"/>
+                <MenuItem Header="すべて選択(_A)" IsEnabled="{Binding Searcher.ExistsResults, Mode=OneWay}"/>
+                <MenuItem Header="選択の切り替え(_R)" IsEnabled="{Binding Searcher.ExistsResults, Mode=OneWay}"/>
             </MenuItem>
         </Menu>
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar>
                 <Button Command="{Binding ClearResultsCommand, Mode=OneWay}">
-                    <Rectangle Width="16" Height="16" Fill="{StaticResource NewFileIcon}"/>
+                    <Rectangle Style="{StaticResource IconStyle}" Width="16" Height="16" Fill="{StaticResource NewFileIcon}"/>
                 </Button>
                 <Button Command="{Binding ChooseFolderCommand, Mode=OneWay}">
-                    <Rectangle Width="16" Height="16" Fill="{StaticResource OpenFolderIcon}"/>
+                    <Rectangle Style="{StaticResource IconStyle}" Width="16" Height="16" Fill="{StaticResource OpenFolderIcon}"/>
                 </Button>
                 <Button Command="{Binding SaveResultsCommand, Mode=OneWay}">
-                    <Rectangle Width="16" Height="16" Fill="{StaticResource SaveAsIcon}"/>
+                    <Rectangle Style="{StaticResource IconStyle}" Width="16" Height="16" Fill="{StaticResource SaveAsIcon}"/>
+                </Button>
+                <Separator/>
+                <Button IsEnabled="{Binding Searcher.ExistsResults, Mode=OneWay}">
+                    <Rectangle Style="{StaticResource IconStyle}" Width="16" Height="16" Fill="{StaticResource CopyIcon}"/>
                 </Button>
                 <Separator/>
                 <Button>
-                    <Rectangle Width="16" Height="16" Fill="{StaticResource CopyIcon}"/>
-                </Button>
-                <Separator/>
-                <Button>
-                    <Rectangle Width="16" Height="16" Fill="{StaticResource CutIcon}"/>
+                    <Rectangle Style="{StaticResource IconStyle}" Width="16" Height="16" Fill="{StaticResource CutIcon}"/>
                 </Button>
                 <Button>
-                    <Rectangle Width="16" Height="16" Fill="{StaticResource CopyIcon}"/>
+                    <Rectangle Style="{StaticResource IconStyle}" Width="16" Height="16" Fill="{StaticResource CopyIcon}"/>
                 </Button>
                 <Button>
-                    <Rectangle Width="16" Height="16" Fill="{StaticResource PasteIcon}"/>
+                    <Rectangle Style="{StaticResource IconStyle}" Width="16" Height="16" Fill="{StaticResource PasteIcon}"/>
                 </Button>
             </ToolBar>
         </ToolBarTray>
         <StatusBar DockPanel.Dock="Bottom">
-            <TextBlock Text="{Binding Searcher.Status, Mode=OneWay}"/>
+            <StatusBarItem>
+                <TextBlock Text="{Binding Status, Mode=OneWay}"/>
+            </StatusBarItem>
         </StatusBar>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -117,39 +127,45 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <ListView Grid.RowSpan="3" ItemsSource="{Binding Searcher.Results}">
+            <ListView Grid.RowSpan="3" ItemsSource="{Binding ResultsView}">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="ファイル名" DisplayMemberBinding="{Binding FileName, Mode=OneWay}"/>
-                        <GridViewColumn Header="拡張子" DisplayMemberBinding="{Binding Extension, Mode=OneWay}"/>
-                        <GridViewColumn Header="ディレクトリ" DisplayMemberBinding="{Binding DirectoryName, Mode=OneWay}"/>
+                        <GridViewColumn DisplayMemberBinding="{Binding FileName, Mode=OneWay}">
+                            <GridViewColumnHeader Content="ファイル名" Command="{Binding SortResultsCommand, Mode=OneWay}" CommandParameter="FileName"/>
+                        </GridViewColumn>
+                        <GridViewColumn DisplayMemberBinding="{Binding Extension, Mode=OneWay}">
+                            <GridViewColumnHeader Content="拡張子" Command="{Binding SortResultsCommand, Mode=OneWay}" CommandParameter="Extension"/>
+                        </GridViewColumn>
+                        <GridViewColumn DisplayMemberBinding="{Binding DirectoryName, Mode=OneWay}">
+                            <GridViewColumnHeader Content="ディレクトリ" Command="{Binding SortResultsCommand, Mode=OneWay}" CommandParameter="DirectoryName"/>
+                        </GridViewColumn>
                     </GridView>
                 </ListView.View>
             </ListView>
             <GridSplitter Grid.Column="1" Grid.RowSpan="3" Width="4" HorizontalAlignment="Stretch"/>
-            <Border Grid.Column="2" BorderBrush="{StaticResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="1">
+            <Border Grid.Column="2" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="1">
                 <StackPanel>
-                    <Border BorderBrush="{StaticResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="0,0,0,1">
-                        <TextBlock Text="検索条件" Padding="4,2">
+                    <Border BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="0,0,0,1">
+                        <TextBlock Text="検索条件" Padding="4,2" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}">
                             <TextBlock.Background>
-                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                    <GradientStop Color="{StaticResource {x:Static SystemColors.GradientInactiveCaptionColorKey}}" Offset="0"/>
-                                    <GradientStop Color="{StaticResource {x:Static SystemColors.ActiveCaptionColorKey}}" Offset="1"/>
+                                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                    <GradientStop Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
+                                    <GradientStop Color="{DynamicResource {x:Static SystemColors.GradientActiveCaptionColorKey}}" Offset="1"/>
                                 </LinearGradientBrush>
                             </TextBlock.Background>
                         </TextBlock>
                     </Border>
-                    <TextBlock Text="ディレクトリ名" Margin="8,8,8,0"/>
-                    <TextBox Margin="8,0" Text="{Binding Condition.TargetDirectory, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Button Content="ディレクトリの選択" Margin="8" HorizontalAlignment="Right" Command="{Binding ChooseFolderCommand, Mode=OneWay}"/>
-                    <TextBlock Text="ファイル名" Margin="8,0"/>
-                    <TextBox Margin="8,0,8,8" Text="{Binding Condition.FileName, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Label Content="ディレクトリ名(_D):" Target="{Binding ElementName=directoryName, Mode=OneWay}" Padding="0" Margin="8,8,8,0"/>
+                    <TextBox x:Name="directoryName" Margin="8,0" Text="{Binding Condition.TargetDirectory, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Content="ディレクトリの選択" Margin="8" HorizontalAlignment="Right" IsDefault="{Binding IsFocused, ElementName=directoryName, Mode=OneWay}" Command="{Binding ChooseFolderCommand, Mode=OneWay}"/>
+                    <Label Content="ファイル名(_F):" Target="{Binding ElementName=fileName, Mode=OneWay}" Padding="0" Margin="8,0"/>
+                    <TextBox x:Name="fileName" Margin="8,0,8,8" Text="{Binding Condition.FileName, UpdateSourceTrigger=PropertyChanged}"/>
                     <StackPanel Orientation="Horizontal" Margin="8,0" HorizontalAlignment="Center">
                         <RadioButton Content="ワイルドカード" Margin="8,0" HorizontalAlignment="Center" IsChecked="{Binding Condition.MatchType, ConverterParameter=Wildcard, Converter={StaticResource EnumBooleanConverter}}"/>
                         <RadioButton Content="正規表現" Margin="8,0" HorizontalAlignment="Center" IsChecked="{Binding Condition.MatchType, ConverterParameter=Regex, Converter={StaticResource EnumBooleanConverter}}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="8,16,8,0" HorizontalAlignment="Right">
-                        <Button IsDefault="True" Command="{Binding SearchCommand, Mode=OneWay}">
+                        <Button IsDefault="{Binding IsFocused, Converter={StaticResource BooleanNegationConverter}, ElementName=directoryName, Mode=OneWay}" Command="{Binding SearchCommand, Mode=OneWay}">
                             <Button.Style>
                                 <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                                     <Style.Triggers>
@@ -163,12 +179,12 @@
                                 </Style>
                             </Button.Style>
                         </Button>
-                        <Button Content="リストのクリア" Margin="8,0,0,0" Command="{Binding ClearResultsCommand, Mode=OneWay}"/>
+                        <Button Content="リストのクリア" Margin="8,0,0,0" Command="{Binding ClearResultsCommand, Mode=OneWay}" IsEnabled="{Binding Searcher.IsSearching, Converter={StaticResource BooleanNegationConverter}, Mode=OneWay}"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
             <GridSplitter Grid.Row="1" Grid.Column="2" Height="4" HorizontalAlignment="Stretch"/>
-            <Border Grid.Row="2" Grid.Column="2" BorderBrush="{StaticResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="1">
+            <Border Grid.Row="2" Grid.Column="2" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="1">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
@@ -180,12 +196,12 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Border Grid.ColumnSpan="2" BorderBrush="{StaticResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="0,0,0,1">
-                        <TextBlock Text="アクション" Padding="4,2">
+                    <Border Grid.ColumnSpan="2" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="0,0,0,1">
+                        <TextBlock Text="アクション" Padding="4,2" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}">
                             <TextBlock.Background>
-                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                    <GradientStop Color="{StaticResource {x:Static SystemColors.GradientInactiveCaptionColorKey}}" Offset="0"/>
-                                    <GradientStop Color="{StaticResource {x:Static SystemColors.ActiveCaptionColorKey}}" Offset="1"/>
+                                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                    <GradientStop Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
+                                    <GradientStop Color="{DynamicResource {x:Static SystemColors.GradientActiveCaptionColorKey}}" Offset="1"/>
                                 </LinearGradientBrush>
                             </TextBlock.Background>
                         </TextBlock>
