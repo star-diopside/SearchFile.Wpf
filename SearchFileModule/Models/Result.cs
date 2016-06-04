@@ -1,12 +1,10 @@
-﻿using PropertyChanged;
-using System.IO;
+﻿using System.IO;
 
 namespace SearchFile.Models
 {
     /// <summary>
     /// ファイル検索結果を表すクラス
     /// </summary>
-    [ImplementPropertyChanged]
     public class Result
     {
         /// <summary>
@@ -27,11 +25,11 @@ namespace SearchFile.Models
         /// <summary>
         /// ファイルパスを取得または設定する。
         /// </summary>
-        public string FilePath { get; set; }
+        public string FilePath { get; }
 
-        public static Result Of(string path)
+        public Result(string path)
         {
-            return new Result() { FilePath = path };
+            this.FilePath = path;
         }
     }
 }

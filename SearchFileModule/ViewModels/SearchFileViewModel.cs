@@ -2,6 +2,7 @@
 using NLog;
 using Prism.Commands;
 using Prism.Interactivity.InteractionRequest;
+using Prism.Mvvm;
 using PropertyChanged;
 using SearchFile.Messaging;
 using SearchFile.Messaging.FileFilters;
@@ -17,39 +18,15 @@ using System.Windows.Data;
 namespace SearchFile.ViewModels
 {
     [ImplementPropertyChanged]
-    public class SearchFileViewModel
+    public class SearchFileViewModel : BindableBase
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        private Searcher searcher;
         private CollectionViewSource resultsViewSource;
 
         [Dependency]
         public SearchFile.Models.Condition Condition { get; set; }
 
-        [Dependency]
-        public Searcher Searcher
-        {
-            get
-            {
-                return this.searcher;
-            }
-            set
-            {
-                if (this.searcher != null)
-                {
-                    PropertyChangedEventManager.RemoveHandler(this.searcher, this.SearcherStatusChanged, nameof(Searcher.Status));
-                }
-
-                this.searcher = value;
-                this.resultsViewSource = new CollectionViewSource() { Source = this.searcher.Results };
-
-                if (searcher != null)
-                {
-                    PropertyChangedEventManager.AddHandler(this.searcher, this.SearcherStatusChanged, nameof(Searcher.Status));
-                }
-            }
-        }
-
+        public Searcher Searcher { get; }
         public ICollectionView ResultsView => this.resultsViewSource.View;
         public string Status { get; private set; }
 
@@ -68,20 +45,38 @@ namespace SearchFile.ViewModels
         {
             this.ChooseFolderCommand = new DelegateCommand(this.ChooseFolder);
             this.SearchCommand = new DelegateCommand(this.Search);
-            this.ClearResultsCommand = new DelegateCommand(() => this.Searcher.Clear());
+            this.ClearResultsCommand = new DelegateCommand(this.ClearResults);
             this.SaveResultsCommand = new DelegateCommand(this.SaveResults);
             this.CopyResultsCommand = new DelegateCommand(this.CopyResults);
             this.SortResultsCommand = new DelegateCommand<string>(this.SortResults);
         }
 
-        private void SearcherStatusChanged(object sender, PropertyChangedEventArgs e)
+        [InjectionConstructor]
+        public SearchFileViewModel(Searcher searcher) : this()
         {
-            this.Status = ((Searcher)sender).Status;
+            if (searcher == null)
+            {
+                throw new ArgumentNullException(nameof(searcher));
+            }
+
+            PropertyChangedEventManager.AddHandler(searcher, this.SearchingDirectoryChanged, nameof(searcher.SearchingDirectory));
+            this.resultsViewSource = new CollectionViewSource() { Source = searcher.Results };
+            this.Searcher = searcher;
         }
 
-        public void SetError(Exception ex)
+        private void SearchingDirectoryChanged(object sender, PropertyChangedEventArgs e)
         {
-            this.Status = Resources.SearchingErrorMessage;
+            var searcher = (Searcher)sender;
+            var directory = searcher.SearchingDirectory;
+
+            if (directory == null)
+            {
+                this.Status = string.Format(Resources.SearchingResultMessage, searcher.Results.Count);
+            }
+            else
+            {
+                this.Status = string.Format(Resources.SearchingDirectoryMessage, directory);
+            }
         }
 
         private void ChooseFolder()
@@ -112,8 +107,15 @@ namespace SearchFile.ViewModels
             {
                 logger.Error(ex, ex.Message);
                 this.ExceptionRequest.Raise(new Notification() { Content = ex });
-                this.SetError(ex);
+                this.Status = Resources.SearchingErrorMessage;
             }
+        }
+
+        private void ClearResults()
+        {
+            this.Searcher.Clear();
+            this.resultsViewSource.SortDescriptions.Clear();
+            this.Status = Resources.ClearResultsMessage;
         }
 
         private void SaveResults()

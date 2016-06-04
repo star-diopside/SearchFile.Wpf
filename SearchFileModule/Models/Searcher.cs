@@ -2,7 +2,6 @@
 using NLog;
 using Prism.Mvvm;
 using PropertyChanged;
-using SearchFileModule.Properties;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,7 +20,7 @@ namespace SearchFile.Models
 
         public ObservableCollection<Result> Results { get; } = new ObservableCollection<Result>();
 
-        public string Status { get; private set; }
+        public string SearchingDirectory { get; private set; }
 
         public bool IsSearching => this.CancellationTokenSource != null;
 
@@ -41,11 +40,7 @@ namespace SearchFile.Models
                 throw new InvalidOperationException();
             }
 
-            var directoryProgress = new Progress<string>(directory =>
-            {
-                this.Status = string.Format(Resources.SearchingDirectoryMessage, directory);
-            });
-
+            var directoryProgress = new Progress<string>(directory => this.SearchingDirectory = directory);
             var resultProgress = new Progress<Result>(result => this.Results.Add(result));
 
             this.Results.Clear();
@@ -68,7 +63,7 @@ namespace SearchFile.Models
                 this.CancellationTokenSource = null;
             }
 
-            this.Status = string.Format(Resources.SearchingResultMessage, this.Results.Count);
+            this.SearchingDirectory = null;
         }
 
         private static void Search(string path, Func<string, IEnumerable<string>> strategy,
@@ -79,7 +74,7 @@ namespace SearchFile.Models
 
             try
             {
-                var results = from file in strategy(path) select Result.Of(file);
+                var results = from file in strategy(path) select new Result(file);
                 foreach (var result in results)
                 {
                     resultProgress.Report(result);
@@ -104,7 +99,6 @@ namespace SearchFile.Models
         public void Clear()
         {
             this.Results.Clear();
-            this.Status = Resources.ClearResultsMessage;
         }
 
         public void Save(string fileName)
