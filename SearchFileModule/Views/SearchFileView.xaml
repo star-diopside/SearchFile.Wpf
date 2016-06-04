@@ -30,6 +30,7 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converter:BooleanNegationConverter x:Key="BooleanNegationConverter"/>
             <converter:EnumBooleanConverter x:Key="EnumBooleanConverter"/>
         </ResourceDictionary>
@@ -112,6 +113,9 @@
             </ToolBar>
         </ToolBarTray>
         <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem DockPanel.Dock="Right" Margin="0,0,16,0" VerticalContentAlignment="Stretch" Visibility="{Binding Searcher.IsSearching, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
+                <ProgressBar Width="100" IsIndeterminate="True"/>
+            </StatusBarItem>
             <StatusBarItem>
                 <TextBlock Text="{Binding Status, Mode=OneWay}"/>
             </StatusBarItem>
