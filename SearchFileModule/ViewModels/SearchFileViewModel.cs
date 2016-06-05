@@ -21,13 +21,16 @@ namespace SearchFile.ViewModels
     public class SearchFileViewModel : BindableBase
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        private CollectionViewSource resultsViewSource;
+        private readonly CollectionViewSource resultsViewSource;
 
         [Dependency]
         public SearchFile.Models.Condition Condition { get; set; }
 
-        public Searcher Searcher { get; }
+        private Searcher Searcher { get; }
+
         public ICollectionView ResultsView => this.resultsViewSource.View;
+        public bool IsSearching => this.Searcher.IsSearching;
+        public bool ExistsResults => this.Searcher.ExistsResults;
         public string Status { get; private set; }
 
         public DelegateCommand ChooseFolderCommand { get; }
@@ -59,9 +62,12 @@ namespace SearchFile.ViewModels
                 throw new ArgumentNullException(nameof(searcher));
             }
 
-            PropertyChangedEventManager.AddHandler(searcher, this.SearchingDirectoryChanged, nameof(searcher.SearchingDirectory));
-            this.resultsViewSource = new CollectionViewSource() { Source = searcher.Results };
             this.Searcher = searcher;
+            this.resultsViewSource = new CollectionViewSource() { Source = searcher.Results };
+
+            PropertyChangedEventManager.AddHandler(searcher, (s, e) => this.OnPropertyChanged(nameof(IsSearching)), nameof(searcher.IsSearching));
+            PropertyChangedEventManager.AddHandler(searcher, (s, e) => this.OnPropertyChanged(nameof(ExistsResults)), nameof(searcher.ExistsResults));
+            PropertyChangedEventManager.AddHandler(searcher, this.SearchingDirectoryChanged, nameof(searcher.SearchingDirectory));
         }
 
         private void SearchingDirectoryChanged(object sender, PropertyChangedEventArgs e)
