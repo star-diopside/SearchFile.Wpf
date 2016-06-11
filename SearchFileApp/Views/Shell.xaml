@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:prism="http://prismlibrary.com/"
         ResizeMode="CanResizeWithGrip"
-        Title="ファイルの検索">
+        Title="ファイルの検索"
+        UseLayoutRounding="True">
     <Grid>
         <ContentControl prism:RegionManager.RegionName="MainRegion"/>
     </Grid>

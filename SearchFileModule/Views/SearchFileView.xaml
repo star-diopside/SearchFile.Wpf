@@ -142,7 +142,15 @@
             <ListView Grid.RowSpan="3" ItemsSource="{Binding ResultsView}">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn DisplayMemberBinding="{Binding FileName, Mode=OneWay}">
+                        <GridViewColumn>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="{Binding IconSource, Mode=OneWay}" VerticalAlignment="Center" Margin="0,0,4,0" Width="16" Height="16"/>
+                                        <TextBlock Text="{Binding FileName, Mode=OneWay}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
                             <GridViewColumnHeader Content="ファイル名" Command="{Binding SortResultsCommand, Mode=OneWay}" CommandParameter="FileName"/>
                         </GridViewColumn>
                         <GridViewColumn DisplayMemberBinding="{Binding Extension, Mode=OneWay}">
