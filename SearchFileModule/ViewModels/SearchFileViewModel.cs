@@ -32,16 +32,21 @@ namespace SearchFile.ViewModels
         public bool IsSearching => this.Searcher.IsSearching;
         public bool ExistsResults => this.Searcher.ExistsResults;
         public string Status { get; private set; }
+        public bool RecyclesDeleteFiles { get; set; } = true;
 
         public DelegateCommand ChooseFolderCommand { get; }
         public DelegateCommand SearchCommand { get; }
         public DelegateCommand ClearResultsCommand { get; }
+        public DelegateCommand SelectAllCommand { get; }
+        public DelegateCommand ReverseSelectionCommand { get; }
+        public DelegateCommand DeleteSelectionFileCommand { get; }
         public DelegateCommand SaveResultsCommand { get; }
         public DelegateCommand CopyResultsCommand { get; }
         public DelegateCommand<string> SortResultsCommand { get; }
 
-        public InteractionRequest<Notification> ChooseFolderRequest { get; } = new InteractionRequest<Notification>();
         public InteractionRequest<Notification> ExceptionRequest { get; } = new InteractionRequest<Notification>();
+        public InteractionRequest<Notification> ChooseFolderRequest { get; } = new InteractionRequest<Notification>();
+        public InteractionRequest<Notification> DeleteFileRequest { get; } = new InteractionRequest<Notification>();
         public InteractionRequest<Notification> SaveFileRequest { get; } = new InteractionRequest<Notification>();
 
         public SearchFileViewModel()
@@ -49,6 +54,9 @@ namespace SearchFile.ViewModels
             this.ChooseFolderCommand = new DelegateCommand(this.ChooseFolder);
             this.SearchCommand = new DelegateCommand(this.Search);
             this.ClearResultsCommand = new DelegateCommand(this.ClearResults);
+            this.SelectAllCommand = new DelegateCommand(this.SelectAll);
+            this.ReverseSelectionCommand = new DelegateCommand(this.ReverseSelection);
+            this.DeleteSelectionFileCommand = new DelegateCommand(this.DeleteSelectionFile);
             this.SaveResultsCommand = new DelegateCommand(this.SaveResults);
             this.CopyResultsCommand = new DelegateCommand(this.CopyResults);
             this.SortResultsCommand = new DelegateCommand<string>(this.SortResults);
@@ -122,6 +130,43 @@ namespace SearchFile.ViewModels
             this.Searcher.Clear();
             this.resultsViewSource.SortDescriptions.Clear();
             this.Status = Resources.ClearResultsMessage;
+        }
+
+        private void SelectAll()
+        {
+            foreach (var result in this.Searcher.Results)
+            {
+                result.IsSelected = true;
+            }
+        }
+
+        private void ReverseSelection()
+        {
+            foreach (var result in this.Searcher.Results)
+            {
+                result.IsSelected = !result.IsSelected;
+            }
+        }
+
+        private void DeleteSelectionFile()
+        {
+            this.DeleteFileRequest.Raise(new Notification()
+            {
+                Content = new DeleteFileMessage()
+                {
+                    Results = this.Searcher.Results.Where(result => result.IsSelected).ToArray(),
+                    Recycle = this.RecyclesDeleteFiles
+                }
+            }, n =>
+            {
+                int count = 0;
+                foreach (var result in ((DeleteFileMessage)n.Content).Results)
+                {
+                    this.Searcher.Results.Remove(result);
+                    count++;
+                }
+                this.Status = string.Format(Resources.FileDeleteMessage, count);
+            });
         }
 
         private void SaveResults()

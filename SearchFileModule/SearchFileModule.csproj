@@ -86,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Messaging\ChooseFolderMessage.cs" />
+    <Compile Include="Messaging\DeleteFileMessage.cs" />
     <Compile Include="Messaging\FileFilters\AllFileFilter.cs" />
     <Compile Include="Messaging\FileFilters\CsvFileFilter.cs" />
     <Compile Include="Messaging\FileFilters\Filter.cs" />
@@ -104,6 +105,7 @@
     <Compile Include="SearchFileModule.cs" />
     <Compile Include="ViewModels\SearchFileViewModel.cs" />
     <Compile Include="Views\Action\ChooseFolderAction.cs" />
+    <Compile Include="Views\Action\DeleteFileAction.cs" />
     <Compile Include="Views\Action\ExceptionAction.cs" />
     <Compile Include="Views\Action\SaveFileAction.cs" />
     <Compile Include="Views\Action\WindowCloseAction.cs" />
@@ -112,6 +114,7 @@
     <Compile Include="Views\SearchFileView.xaml.cs">
       <DependentUpon>SearchFileView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WindowsShell\FileOperate.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />

@@ -11,8 +11,8 @@ namespace SearchFile.Views.Action
         protected override void Invoke(object parameter)
         {
             var args = parameter as InteractionRequestedEventArgs;
-            var cfm = args?.Context?.Content as ChooseFolderMessage;
-            if (cfm == null)
+            var message = args?.Context?.Content as ChooseFolderMessage;
+            if (message == null)
             {
                 return;
             }
@@ -20,11 +20,11 @@ namespace SearchFile.Views.Action
             using (var dialog = new CommonOpenFileDialog())
             {
                 dialog.IsFolderPicker = true;
-                dialog.InitialDirectory = cfm.Path;
+                dialog.InitialDirectory = message.Path;
 
                 if (dialog.ShowDialog(Window.GetWindow(this.AssociatedObject)) == CommonFileDialogResult.Ok)
                 {
-                    cfm.Path = dialog.FileName;
+                    message.Path = dialog.FileName;
                     args.Callback();
                 }
             }

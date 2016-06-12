@@ -1,5 +1,7 @@
 ﻿using Microsoft.WindowsAPICodePack.Shell;
 using NLog;
+using Prism.Mvvm;
+using PropertyChanged;
 using System.IO;
 using System.Windows.Media;
 
@@ -8,7 +10,8 @@ namespace SearchFile.Models
     /// <summary>
     /// ファイル検索結果を表すクラス
     /// </summary>
-    public class Result
+    [ImplementPropertyChanged]
+    public class Result : BindableBase
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -26,6 +29,11 @@ namespace SearchFile.Models
         /// ディレクトリ名を取得する。
         /// </summary>
         public string DirectoryName => Path.GetDirectoryName(this.FilePath);
+
+        /// <summary>
+        /// リスト項目が選択されているかどうかを示す値を取得または設定する。
+        /// </summary>
+        public bool IsSelected { get; set; }
 
         /// <summary>
         /// ファイルに関連付けられたアイコンを取得する。

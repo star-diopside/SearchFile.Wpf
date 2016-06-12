@@ -12,23 +12,23 @@ namespace SearchFile.Views.Action
         protected override void Invoke(object parameter)
         {
             var args = parameter as InteractionRequestedEventArgs;
-            var sfm = args?.Context?.Content as SaveFileMessage;
-            if (sfm == null)
+            var message = args?.Context?.Content as SaveFileMessage;
+            if (message == null)
             {
                 return;
             }
 
             var dialog = new SaveFileDialog()
             {
-                FileName = sfm.Path,
-                Filter = string.Join("|", from filter in sfm.Filters
+                FileName = message.Path,
+                Filter = string.Join("|", from filter in message.Filters
                                           let pattern = string.Join(";", filter.Patterns)
                                           select $"{filter.Name} ({pattern})|{pattern}")
             };
 
             if (dialog.ShowDialog(Window.GetWindow(this.AssociatedObject)) == true)
             {
-                sfm.Path = dialog.FileName;
+                message.Path = dialog.FileName;
                 args.Callback();
             }
         }

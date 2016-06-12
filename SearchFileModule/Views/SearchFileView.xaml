@@ -44,13 +44,16 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <i:Interaction.Triggers>
-        <prism:InteractionRequestTrigger SourceObject="{Binding ExceptionRequest}">
+        <prism:InteractionRequestTrigger SourceObject="{Binding ExceptionRequest, Mode=OneWay}">
             <action:ExceptionAction/>
         </prism:InteractionRequestTrigger>
-        <prism:InteractionRequestTrigger SourceObject="{Binding ChooseFolderRequest}">
+        <prism:InteractionRequestTrigger SourceObject="{Binding ChooseFolderRequest, Mode=OneWay}">
             <action:ChooseFolderAction/>
         </prism:InteractionRequestTrigger>
-        <prism:InteractionRequestTrigger SourceObject="{Binding SaveFileRequest}">
+        <prism:InteractionRequestTrigger SourceObject="{Binding DeleteFileRequest, Mode=OneWay}">
+            <action:DeleteFileAction/>
+        </prism:InteractionRequestTrigger>
+        <prism:InteractionRequestTrigger SourceObject="{Binding SaveFileRequest, Mode=OneWay}">
             <action:SaveFileAction/>
         </prism:InteractionRequestTrigger>
     </i:Interaction.Triggers>
@@ -89,8 +92,8 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Header="すべて選択(_A)" IsEnabled="{Binding ExistsResults, Mode=OneWay}"/>
-                <MenuItem Header="選択の切り替え(_R)" IsEnabled="{Binding ExistsResults, Mode=OneWay}"/>
+                <MenuItem Header="すべて選択(_A)" Command="{Binding SelectAllCommand, Mode=OneWay}" IsEnabled="{Binding ExistsResults, Mode=OneWay}"/>
+                <MenuItem Header="選択の切り替え(_R)" Command="{Binding ReverseSelectionCommand, Mode=OneWay}" IsEnabled="{Binding ExistsResults, Mode=OneWay}"/>
             </MenuItem>
         </Menu>
         <ToolBarTray DockPanel.Dock="Top">
@@ -139,7 +142,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <ListView Grid.RowSpan="3" ItemsSource="{Binding ResultsView}">
+            <ListView Grid.RowSpan="3" ItemsSource="{Binding ResultsView}" SelectionChanged="ResultsViewSelectionChanged">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn>
@@ -161,6 +164,11 @@
                         </GridViewColumn>
                     </GridView>
                 </ListView.View>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=OneWay}"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
             </ListView>
             <GridSplitter Grid.Column="1" Grid.RowSpan="3" Width="4" HorizontalAlignment="Stretch"/>
             <Border Grid.Column="2" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="1">
@@ -212,10 +220,10 @@
                     <Border Grid.ColumnSpan="2" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="0,0,0,1">
                         <TextBlock Text="アクション" Padding="4,2" Style="{DynamicResource ActiveCaptionTextBlockStyle}"/>
                     </Border>
-                    <Button Grid.Row="1" Content="すべて選択" Margin="8,16,4,8" IsEnabled="{Binding ExistsResults, Mode=OneWay}"/>
-                    <Button Grid.Row="1" Grid.Column="1" Content="選択の切り替え" Margin="4,16,8,8" IsEnabled="{Binding ExistsResults, Mode=OneWay}"/>
-                    <Button Grid.Row="2" Grid.ColumnSpan="2" Content="選択ファイルを削除する" Margin="8,8,8,0" IsEnabled="{Binding ExistsResults, Mode=OneWay}"/>
-                    <CheckBox Grid.Row="3" Grid.ColumnSpan="2" Content="削除時にファイルをごみ箱に移す" HorizontalAlignment="Right" Margin="8" IsEnabled="{Binding ExistsResults, Mode=OneWay}"/>
+                    <Button Grid.Row="1" Content="すべて選択" Margin="8,16,4,8" Command="{Binding SelectAllCommand, Mode=OneWay}" IsEnabled="{Binding ExistsResults, Mode=OneWay}"/>
+                    <Button Grid.Row="1" Grid.Column="1" Content="選択の切り替え" Margin="4,16,8,8" Command="{Binding ReverseSelectionCommand, Mode=OneWay}" IsEnabled="{Binding ExistsResults, Mode=OneWay}"/>
+                    <Button Grid.Row="2" Grid.ColumnSpan="2" Content="選択ファイルを削除する" Margin="8,8,8,0" Command="{Binding DeleteSelectionFileCommand, Mode=OneWay}" IsEnabled="{Binding ExistsResults, Mode=OneWay}"/>
+                    <CheckBox Grid.Row="3" Grid.ColumnSpan="2" Content="削除時にファイルをごみ箱に移す" HorizontalAlignment="Right" Margin="8" IsChecked="{Binding RecyclesDeleteFiles}" IsEnabled="{Binding ExistsResults, Mode=OneWay}"/>
                 </Grid>
             </Border>
         </Grid>

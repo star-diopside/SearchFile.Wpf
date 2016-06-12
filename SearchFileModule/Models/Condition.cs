@@ -15,7 +15,7 @@ namespace SearchFile.Models
     /// ファイル検索条件を表すクラス
     /// </summary>
     [ImplementPropertyChanged]
-    public class Condition : INotifyDataErrorInfo
+    public class Condition : BindableBase, INotifyDataErrorInfo
     {
         private ErrorsContainer<string> errorsContainer;
 
