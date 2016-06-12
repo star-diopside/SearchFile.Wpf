@@ -1,0 +1,11 @@
+﻿<Window x:Class="SearchFile.Views.Shell"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:prism="http://prismlibrary.com/"
+        ResizeMode="CanResizeWithGrip"
+        Title="ファイルの検索"
+        UseLayoutRounding="True">
+    <Grid>
+        <ContentControl prism:RegionManager.RegionName="MainRegion"/>
+    </Grid>
+</Window>
