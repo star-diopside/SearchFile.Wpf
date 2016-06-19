@@ -1,8 +1,8 @@
-﻿using SearchFile.Models;
+﻿using SearchFile.Module.Models;
 using System.Linq;
 using System.Windows.Controls;
 
-namespace SearchFile.Views
+namespace SearchFile.Module.Views
 {
     /// <summary>
     /// SearchFileView.xaml の相互作用ロジック

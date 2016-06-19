@@ -5,7 +5,7 @@ using PropertyChanged;
 using System.IO;
 using System.Windows.Media;
 
-namespace SearchFile.Models
+namespace SearchFile.Module.Models
 {
     /// <summary>
     /// ファイル検索結果を表すクラス

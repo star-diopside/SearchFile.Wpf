@@ -1,11 +1,11 @@
 ﻿using Microsoft.Win32;
 using Prism.Interactivity.InteractionRequest;
-using SearchFile.Messaging;
+using SearchFile.Module.Messaging;
 using System.Linq;
 using System.Windows;
 using System.Windows.Interactivity;
 
-namespace SearchFile.Views.Action
+namespace SearchFile.Module.Views.Action
 {
     public class SaveFileAction : TriggerAction<DependencyObject>
     {

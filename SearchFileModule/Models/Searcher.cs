@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SearchFile.Models
+namespace SearchFile.Module.Models
 {
     [ImplementPropertyChanged]
     public class Searcher : BindableBase

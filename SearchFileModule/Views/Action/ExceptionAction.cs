@@ -1,12 +1,12 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Interactivity.InteractionRequest;
-using SearchFileModule.Properties;
+using SearchFile.Module.Properties;
 using System;
 using System.Windows;
 using System.Windows.Interactivity;
 using System.Windows.Interop;
 
-namespace SearchFile.Views.Action
+namespace SearchFile.Module.Views.Action
 {
     public class ExceptionAction : TriggerAction<DependencyObject>
     {

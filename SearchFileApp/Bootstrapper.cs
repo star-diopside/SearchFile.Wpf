@@ -1,10 +1,11 @@
 ﻿using Microsoft.Practices.Unity;
 using Prism.Modularity;
 using Prism.Unity;
-using SearchFile.Views;
+using SearchFile.App.Views;
+using SearchFile.Module;
 using System.Windows;
 
-namespace SearchFile
+namespace SearchFile.App
 {
     public class Bootstrapper : UnityBootstrapper
     {

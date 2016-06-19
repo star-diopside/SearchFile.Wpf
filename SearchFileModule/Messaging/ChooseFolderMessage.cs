@@ -1,4 +1,4 @@
-﻿namespace SearchFile.Messaging
+﻿namespace SearchFile.Module.Messaging
 {
     public class ChooseFolderMessage
     {

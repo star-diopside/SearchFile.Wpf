@@ -1,11 +1,11 @@
 ﻿using Prism.Interactivity.InteractionRequest;
-using SearchFile.Messaging;
-using SearchFile.WindowsShell;
+using SearchFile.Module.Messaging;
+using SearchFile.Module.Shell;
 using System.Linq;
 using System.Windows;
 using System.Windows.Interactivity;
 
-namespace SearchFile.Views.Action
+namespace SearchFile.Module.Views.Action
 {
     public class DeleteFileAction : TriggerAction<DependencyObject>
     {
@@ -18,7 +18,7 @@ namespace SearchFile.Views.Action
                 return;
             }
 
-            FileOperate.DeleteFiles(Window.GetWindow(this.AssociatedObject),
+            message.IsSuccessful = FileOperate.DeleteFiles(Window.GetWindow(this.AssociatedObject),
                 message.Results.Select(result => result.FilePath), message.Recycle);
 
             args.Callback();

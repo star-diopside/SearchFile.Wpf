@@ -4,10 +4,10 @@ using Prism.Commands;
 using Prism.Interactivity.InteractionRequest;
 using Prism.Mvvm;
 using PropertyChanged;
-using SearchFile.Messaging;
-using SearchFile.Messaging.FileFilters;
-using SearchFile.Models;
-using SearchFileModule.Properties;
+using SearchFile.Module.Messaging;
+using SearchFile.Module.Messaging.FileFilters;
+using SearchFile.Module.Models;
+using SearchFile.Module.Properties;
 using System;
 using System.ComponentModel;
 using System.Linq;
@@ -15,7 +15,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Data;
 
-namespace SearchFile.ViewModels
+namespace SearchFile.Module.ViewModels
 {
     [ImplementPropertyChanged]
     public class SearchFileViewModel : BindableBase
@@ -24,7 +24,7 @@ namespace SearchFile.ViewModels
         private readonly CollectionViewSource resultsViewSource;
 
         [Dependency]
-        public SearchFile.Models.Condition Condition { get; set; }
+        public SearchFile.Module.Models.Condition Condition { get; set; }
 
         private Searcher Searcher { get; }
 
@@ -159,13 +159,20 @@ namespace SearchFile.ViewModels
                 }
             }, n =>
             {
-                int count = 0;
-                foreach (var result in ((DeleteFileMessage)n.Content).Results)
+                var message = (DeleteFileMessage)n.Content;
+
+                if (message.IsSuccessful)
                 {
-                    this.Searcher.Results.Remove(result);
-                    count++;
+                    foreach (var result in message.Results)
+                    {
+                        this.Searcher.Results.Remove(result);
+                    }
+                    this.Status = string.Format(Resources.FileDeleteMessage, message.Results.Count());
                 }
-                this.Status = string.Format(Resources.FileDeleteMessage, count);
+                else
+                {
+                    this.Status = Resources.FileDeleteCancelMessage;
+                }
             });
         }
 

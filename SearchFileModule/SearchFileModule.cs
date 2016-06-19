@@ -1,9 +1,9 @@
 ﻿using Microsoft.Practices.Unity;
 using Prism.Modularity;
 using Prism.Regions;
-using SearchFile.Views;
+using SearchFile.Module.Views;
 
-namespace SearchFile
+namespace SearchFile.Module
 {
     public class SearchFileModule : IModule
     {

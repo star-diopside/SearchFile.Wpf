@@ -1,7 +1,7 @@
-﻿using SearchFile.Messaging.FileFilters;
+﻿using SearchFile.Module.Messaging.FileFilters;
 using System.Collections.Generic;
 
-namespace SearchFile.Messaging
+namespace SearchFile.Module.Messaging
 {
     public class SaveFileMessage
     {
