@@ -88,12 +88,13 @@ namespace SearchFile.Module.Models
             }
             else
             {
+                var fileName = this.FileName;
                 switch (this.MatchType)
                 {
                     case FileNameMatchType.Wildcard:
-                        return path => Directory.EnumerateFiles(path, this.FileName);
+                        return path => Directory.EnumerateFiles(path, fileName);
                     case FileNameMatchType.Regex:
-                        var pattern = new Regex(this.FileName, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+                        var pattern = new Regex(fileName, RegexOptions.IgnoreCase | RegexOptions.Singleline);
                         return path => from file in Directory.EnumerateFiles(path)
                                        where pattern.IsMatch(file)
                                        select file;
