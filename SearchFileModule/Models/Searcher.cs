@@ -16,7 +16,7 @@ namespace SearchFile.Module.Models
     [ImplementPropertyChanged]
     public class Searcher : BindableBase
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         public ObservableCollection<Result> Results { get; } = new ObservableCollection<Result>();
 

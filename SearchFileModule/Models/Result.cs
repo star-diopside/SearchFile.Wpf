@@ -1,7 +1,6 @@
-﻿using Microsoft.WindowsAPICodePack.Shell;
-using NLog;
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
 using PropertyChanged;
+using SearchFile.Module.Shell;
 using System.IO;
 using System.Windows.Media;
 
@@ -13,8 +12,6 @@ namespace SearchFile.Module.Models
     [ImplementPropertyChanged]
     public class Result : BindableBase
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
         /// <summary>
         /// ファイル名を取得する。
         /// </summary>
@@ -38,21 +35,7 @@ namespace SearchFile.Module.Models
         /// <summary>
         /// ファイルに関連付けられたアイコンを取得する。
         /// </summary>
-        public ImageSource IconSource
-        {
-            get
-            {
-                try
-                {
-                    return ShellFile.FromFilePath(this.FilePath).Thumbnail.SmallBitmapSource;
-                }
-                catch (ShellException ex)
-                {
-                    logger.Warn(ex, ex.Message);
-                    return null;
-                }
-            }
-        }
+        public ImageSource IconSource => ExtractIcon.ExtractFileIcon(this.FilePath, ExtractIcon.IconSize.Small);
 
         /// <summary>
         /// ファイルパスを取得する。

@@ -1,4 +1,5 @@
 ﻿using NLog;
+using SearchFile.Module.Interop;
 using SearchFile.Module.Interop.ShellObjects;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace SearchFile.Module.Shell
     /// </summary>
     static class FileOperate
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// 複数のファイルを削除する
@@ -44,7 +45,7 @@ namespace SearchFile.Module.Shell
 
             foreach (var file in files)
             {
-                fo.DeleteItem(Methods.CreateShellItem(file), null);
+                fo.DeleteItem(InteropHelpers.CreateShellItem(file), null);
             }
 
             try

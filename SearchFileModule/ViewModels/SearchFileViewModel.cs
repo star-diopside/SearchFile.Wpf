@@ -20,7 +20,7 @@ namespace SearchFile.Module.ViewModels
     [ImplementPropertyChanged]
     public class SearchFileViewModel : BindableBase
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private readonly CollectionViewSource resultsViewSource;
 
         [Dependency]

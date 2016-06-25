@@ -62,7 +62,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.3.4\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\packages\NLog.4.3.5\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -75,8 +75,8 @@
       <HintPath>..\packages\Prism.Wpf.6.1.0\lib\net45\Prism.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="PropertyChanged, Version=1.51.0.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
-      <HintPath>..\packages\PropertyChanged.Fody.1.51.0\lib\dotnet\PropertyChanged.dll</HintPath>
+    <Reference Include="PropertyChanged, Version=1.51.3.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
+      <HintPath>..\packages\PropertyChanged.Fody.1.51.3\lib\dotnet\PropertyChanged.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -86,13 +86,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interop\ComGuid.cs" />
+    <Compile Include="Interop\CommonControlObjects\IImageList.cs" />
+    <Compile Include="Interop\CommonControlObjects\IMAGEINFO.cs" />
+    <Compile Include="Interop\CommonControlObjects\ImageListDrawFlags.cs" />
+    <Compile Include="Interop\CommonControlObjects\IMAGELISTDRAWPARAMS.cs" />
+    <Compile Include="Interop\InteropHelpers.cs" />
+    <Compile Include="Interop\InteropMethods.cs" />
+    <Compile Include="Interop\POINT.cs" />
+    <Compile Include="Interop\RECT.cs" />
     <Compile Include="Interop\ShellObjects\FileOperation.cs" />
     <Compile Include="Interop\ShellObjects\FileOperationFlags.cs" />
     <Compile Include="Interop\ShellObjects\IFileOperation.cs" />
     <Compile Include="Interop\ShellObjects\IFileOperationProgressSink.cs" />
     <Compile Include="Interop\ShellObjects\IShellItem.cs" />
-    <Compile Include="Interop\ShellObjects\Methods.cs" />
     <Compile Include="Interop\ShellObjects\SIGDN.cs" />
+    <Compile Include="Interop\SHFILEINFO.cs" />
+    <Compile Include="Interop\SHGetFileInfoFlags.cs" />
+    <Compile Include="Interop\SHIL.cs" />
     <Compile Include="Messaging\ChooseFolderMessage.cs" />
     <Compile Include="Messaging\DeleteFileMessage.cs" />
     <Compile Include="Messaging\FileFilters\AllFileFilter.cs" />
@@ -111,6 +121,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SearchFileModule.cs" />
+    <Compile Include="Shell\ExtractIcon.cs" />
     <Compile Include="Shell\FileOperate.cs" />
     <Compile Include="ViewModels\SearchFileViewModel.cs" />
     <Compile Include="Views\Action\ChooseFolderAction.cs" />
