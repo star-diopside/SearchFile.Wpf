@@ -129,6 +129,12 @@
   <data name="ErrorDialogCaption" xml:space="preserve">
     <value>エラー</value>
   </data>
+  <data name="FileDeleteCancelMessage" xml:space="preserve">
+    <value>削除処理をキャンセルしました。</value>
+  </data>
+  <data name="FileDeleteMessage" xml:space="preserve">
+    <value>{0} 個のファイルを削除しました。</value>
+  </data>
   <data name="OccurExceptionMessage" xml:space="preserve">
     <value>エラーが発生しました。</value>
   </data>

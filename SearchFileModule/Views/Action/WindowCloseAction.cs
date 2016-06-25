@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Interactivity;
 
-namespace SearchFile.Views.Action
+namespace SearchFile.Module.Views.Action
 {
     public class WindowCloseAction : TriggerAction<DependencyObject>
     {

@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace SearchFile.Views
+namespace SearchFile.App.Views
 {
     /// <summary>
     /// Shell.xaml の相互作用ロジック

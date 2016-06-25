@@ -1,6 +1,6 @@
 ﻿using Prism.Mvvm;
 using PropertyChanged;
-using SearchFileModule.Properties;
+using SearchFile.Module.Properties;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,13 +9,13 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace SearchFile.Models
+namespace SearchFile.Module.Models
 {
     /// <summary>
     /// ファイル検索条件を表すクラス
     /// </summary>
     [ImplementPropertyChanged]
-    public class Condition : INotifyDataErrorInfo
+    public class Condition : BindableBase, INotifyDataErrorInfo
     {
         private ErrorsContainer<string> errorsContainer;
 

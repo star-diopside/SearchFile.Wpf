@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace SearchFile
+namespace SearchFile.App
 {
     /// <summary>
     /// App.xaml の相互作用ロジック

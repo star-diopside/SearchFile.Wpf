@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SearchFile.Messaging.FileFilters
+namespace SearchFile.Module.Messaging.FileFilters
 {
     public class AllFileFilter : IFilter
     {

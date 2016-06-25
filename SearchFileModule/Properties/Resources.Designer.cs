@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SearchFileModule.Properties {
+namespace SearchFile.Module.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace SearchFileModule.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SearchFileModule.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SearchFile.Module.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -93,6 +93,24 @@ namespace SearchFileModule.Properties {
         internal static string ErrorDialogCaption {
             get {
                 return ResourceManager.GetString("ErrorDialogCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   削除処理をキャンセルしました。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string FileDeleteCancelMessage {
+            get {
+                return ResourceManager.GetString("FileDeleteCancelMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   {0} 個のファイルを削除しました。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string FileDeleteMessage {
+            get {
+                return ResourceManager.GetString("FileDeleteMessage", resourceCulture);
             }
         }
         

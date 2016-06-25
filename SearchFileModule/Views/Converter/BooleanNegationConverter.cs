@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace SearchFile.Views.Converter
+namespace SearchFile.Module.Views.Converter
 {
     [ValueConversion(typeof(bool), typeof(bool))]
     public class BooleanNegationConverter : IValueConverter
