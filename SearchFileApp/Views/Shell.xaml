@@ -4,7 +4,9 @@
         xmlns:prism="http://prismlibrary.com/"
         ResizeMode="CanResizeWithGrip"
         Title="ファイルの検索"
-        UseLayoutRounding="True">
+        UseLayoutRounding="True"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType">
     <Grid>
         <ContentControl prism:RegionManager.RegionName="MainRegion"/>
     </Grid>
