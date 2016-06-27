@@ -145,6 +145,11 @@
             <ListView Grid.RowSpan="3" ItemsSource="{Binding ResultsView}" SelectionChanged="ResultsViewSelectionChanged">
                 <ListView.View>
                     <GridView>
+                        <i:Interaction.Triggers>
+                            <prism:InteractionRequestTrigger SourceObject="{Binding AdjustColumnWidthRequest, Mode=OneWay}">
+                                <action:AdjustColumnWidthAction/>
+                            </prism:InteractionRequestTrigger>
+                        </i:Interaction.Triggers>
                         <GridViewColumn>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>

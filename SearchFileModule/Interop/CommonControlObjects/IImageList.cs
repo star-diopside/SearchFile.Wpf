@@ -30,7 +30,7 @@ namespace SearchFile.Module.Interop.CommonControlObjects
             uint crMask);
 
         void Draw(
-            ref IMAGELISTDRAWPARAMS pimldp);
+            [In] ref IMAGELISTDRAWPARAMS pimldp);
 
         void Remove(int i);
 

@@ -46,6 +46,7 @@ namespace SearchFile.Module.ViewModels
 
         public InteractionRequest<Notification> ExceptionRequest { get; } = new InteractionRequest<Notification>();
         public InteractionRequest<Notification> ChooseFolderRequest { get; } = new InteractionRequest<Notification>();
+        public InteractionRequest<Notification> AdjustColumnWidthRequest { get; } = new InteractionRequest<Notification>();
         public InteractionRequest<Notification> DeleteFileRequest { get; } = new InteractionRequest<Notification>();
         public InteractionRequest<Notification> SaveFileRequest { get; } = new InteractionRequest<Notification>();
 
@@ -115,6 +116,7 @@ namespace SearchFile.Module.ViewModels
                 else
                 {
                     await this.Searcher.Search(this.Condition);
+                    this.AdjustColumnWidthRequest.Raise(new Notification());
                 }
             }
             catch (Exception ex)

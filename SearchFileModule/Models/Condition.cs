@@ -25,7 +25,7 @@ namespace SearchFile.Module.Models
 
         public IEnumerable GetErrors(string propertyName) => this.errorsContainer.GetErrors(propertyName);
 
-        private string targetDirectory = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System));
+        private string _targetDirectory = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System));
 
         /// <summary>
         /// 検索対象ディレクトリを取得または設定する。
@@ -34,13 +34,13 @@ namespace SearchFile.Module.Models
         {
             get
             {
-                return this.targetDirectory;
+                return this._targetDirectory;
             }
             set
             {
-                this.targetDirectory = value;
+                this._targetDirectory = value;
 
-                if (Directory.Exists(this.targetDirectory))
+                if (Directory.Exists(this._targetDirectory))
                 {
                     this.errorsContainer.ClearErrors(nameof(TargetDirectory));
                 }

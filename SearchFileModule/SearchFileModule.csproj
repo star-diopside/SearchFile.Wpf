@@ -124,6 +124,7 @@
     <Compile Include="Shell\ExtractIcon.cs" />
     <Compile Include="Shell\FileOperate.cs" />
     <Compile Include="ViewModels\SearchFileViewModel.cs" />
+    <Compile Include="Views\Action\AdjustColumnWidthAction.cs" />
     <Compile Include="Views\Action\ChooseFolderAction.cs" />
     <Compile Include="Views\Action\DeleteFileAction.cs" />
     <Compile Include="Views\Action\ExceptionAction.cs" />

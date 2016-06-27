@@ -9,15 +9,15 @@ namespace SearchFile.Module.Interop
         [DllImport("shell32.dll", CharSet = CharSet.Unicode, PreserveSig = false, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Interface)]
         internal static extern object SHCreateItemFromParsingName(
-            [MarshalAs(UnmanagedType.LPWStr)] string pszPath, IBindCtx pbc, ref Guid riid);
+            [MarshalAs(UnmanagedType.LPWStr)] string pszPath, IBindCtx pbc, [In] ref Guid riid);
 
         [DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern IntPtr SHGetFileInfo([MarshalAs(UnmanagedType.LPWStr)] string pszPath,
             uint dwFileAttributes, ref SHFILEINFO psfi, uint cbFileInfo, SHGetFileInfoFlags uFlags);
 
-        [DllImport("shell32.dll", CharSet = CharSet.Unicode, PreserveSig = false, SetLastError = true)]
+        [DllImport("shell32.dll", PreserveSig = false, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Interface)]
-        internal static extern object SHGetImageList(SHIL iImageList, ref Guid riid);
+        internal static extern object SHGetImageList(SHIL iImageList, [In] ref Guid riid);
 
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
