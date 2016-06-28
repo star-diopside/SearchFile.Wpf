@@ -12,6 +12,8 @@ namespace SearchFile.Module.Models
     [ImplementPropertyChanged]
     public class Result : BindableBase
     {
+        private ImageSource _iconSource;
+
         /// <summary>
         /// ファイル名を取得する。
         /// </summary>
@@ -35,7 +37,7 @@ namespace SearchFile.Module.Models
         /// <summary>
         /// ファイルに関連付けられたアイコンを取得する。
         /// </summary>
-        public ImageSource IconSource => ExtractIcon.ExtractFileIcon(this.FilePath, ExtractIcon.IconSize.Small);
+        public ImageSource IconSource => this._iconSource ?? (this._iconSource = ExtractIcon.ExtractFileIcon(this.FilePath, ExtractIcon.IconSize.Small));
 
         /// <summary>
         /// ファイルパスを取得する。

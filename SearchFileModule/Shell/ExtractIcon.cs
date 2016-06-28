@@ -38,21 +38,32 @@ namespace SearchFile.Module.Shell
             InteropMethods.SHGetFileInfo(fileName, 0, ref fileInfo, (uint)Marshal.SizeOf(fileInfo),
                 SHGetFileInfoFlags.SHGFI_SYSICONINDEX);
 
-            var imageList = InteropHelpers.GetImageList((SHIL)size);
-
+            IImageList imageList = null;
             IntPtr? icon = null;
 
             try
             {
-                icon = imageList.GetIcon(fileInfo.iIcon, ImageListDrawFlags.ILD_TRANSPARENT);
-                return Imaging.CreateBitmapSourceFromHIcon(icon.Value, Int32Rect.Empty,
-                    BitmapSizeOptions.FromEmptyOptions());
+                imageList = InteropHelpers.GetImageList((SHIL)size);
+
+                try
+                {
+                    icon = imageList.GetIcon(fileInfo.iIcon, ImageListDrawFlags.ILD_TRANSPARENT);
+                    return Imaging.CreateBitmapSourceFromHIcon(icon.Value,
+                        Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                }
+                finally
+                {
+                    if (icon.HasValue)
+                    {
+                        InteropMethods.DestroyIcon(icon.Value);
+                    }
+                }
             }
             finally
             {
-                if (icon.HasValue)
+                if (imageList != null)
                 {
-                    InteropMethods.DestroyIcon(icon.Value);
+                    Marshal.FinalReleaseComObject(imageList);
                 }
             }
         }
