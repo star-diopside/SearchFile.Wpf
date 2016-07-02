@@ -154,7 +154,7 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <Image Source="{Binding IconSource, Mode=OneWay}" VerticalAlignment="Center" Margin="0,0,4,0" Width="16" Height="16"/>
+                                        <Image Source="{Binding IconSource, Mode=OneWay}" VerticalAlignment="Center" Margin="0,1,4,1" Width="16" Height="16"/>
                                         <TextBlock Text="{Binding FileName, Mode=OneWay}" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </DataTemplate>
