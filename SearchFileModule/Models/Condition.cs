@@ -82,25 +82,26 @@ namespace SearchFile.Module.Models
         /// <returns>指定されたディレクトリのファイル一覧を返すデリゲート</returns>
         public Func<string, IEnumerable<string>> GetSearchFileStrategy()
         {
-            if (string.IsNullOrEmpty(this.FileName))
+            var fileName = this.FileName;
+
+            switch (this.MatchType)
             {
-                return path => Directory.EnumerateFiles(path);
-            }
-            else
-            {
-                var fileName = this.FileName;
-                switch (this.MatchType)
-                {
-                    case FileNameMatchType.Wildcard:
+                case FileNameMatchType.Wildcard:
+                    if (string.IsNullOrWhiteSpace(fileName))
+                    {
+                        return path => Directory.EnumerateFiles(path);
+                    }
+                    else
+                    {
                         return path => Directory.EnumerateFiles(path, fileName);
-                    case FileNameMatchType.Regex:
-                        var pattern = new Regex(fileName, RegexOptions.IgnoreCase | RegexOptions.Singleline);
-                        return path => from file in Directory.EnumerateFiles(path)
-                                       where pattern.IsMatch(file)
-                                       select file;
-                    default:
-                        throw new InvalidOperationException();
-                }
+                    }
+                case FileNameMatchType.Regex:
+                    var pattern = new Regex(fileName, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+                    return path => from file in Directory.EnumerateFiles(path)
+                                   where pattern.IsMatch(file)
+                                   select file;
+                default:
+                    throw new InvalidOperationException();
             }
         }
     }
