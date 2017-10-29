@@ -89,7 +89,7 @@ namespace SearchFile.Module.Models
                 case FileNameMatchType.Wildcard:
                     if (string.IsNullOrWhiteSpace(fileName))
                     {
-                        return path => Directory.EnumerateFiles(path);
+                        return Directory.EnumerateFiles;
                     }
                     else
                     {

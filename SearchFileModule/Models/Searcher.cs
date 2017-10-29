@@ -41,7 +41,7 @@ namespace SearchFile.Module.Models
             }
 
             var directoryProgress = new Progress<string>(directory => this.SearchingDirectory = directory);
-            var resultProgress = new Progress<Result>(result => this.Results.Add(result));
+            var resultProgress = new Progress<Result>(this.Results.Add);
 
             this.Results.Clear();
 
