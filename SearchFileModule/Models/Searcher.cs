@@ -33,7 +33,7 @@ namespace SearchFile.Module.Models
             this.Results.CollectionChanged += (s, e) => this.OnPropertyChanged(nameof(ExistsResults));
         }
 
-        public async Task Search(Condition condition)
+        public async Task SearchAsync(Condition condition)
         {
             if (this.IsSearching)
             {

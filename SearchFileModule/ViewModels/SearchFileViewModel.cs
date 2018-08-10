@@ -115,7 +115,7 @@ namespace SearchFile.Module.ViewModels
                 }
                 else
                 {
-                    await this.Searcher.Search(this.Condition);
+                    await this.Searcher.SearchAsync(this.Condition);
                     this.AdjustColumnWidthRequest.Raise(new Notification());
                 }
             }
