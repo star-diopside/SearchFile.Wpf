@@ -1,10 +1,8 @@
 ﻿using Prism.Mvvm;
-using PropertyChanged;
+using Reactive.Bindings;
 using SearchFile.Wpf.Module.Properties;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -14,52 +12,24 @@ namespace SearchFile.Wpf.Module.Models
     /// <summary>
     /// ファイル検索条件を表すクラス
     /// </summary>
-    [AddINotifyPropertyChangedInterface]
-    public class Condition : BindableBase, INotifyDataErrorInfo
+    public class Condition : BindableBase
     {
-        private ErrorsContainer<string> errorsContainer;
-
-        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
-
-        public bool HasErrors => this.errorsContainer.HasErrors;
-
-        public IEnumerable GetErrors(string propertyName) => this.errorsContainer.GetErrors(propertyName);
-
-        private string _targetDirectory = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System));
-
         /// <summary>
         /// 検索対象ディレクトリを取得または設定する。
         /// </summary>
-        public string TargetDirectory
-        {
-            get
-            {
-                return this._targetDirectory;
-            }
-            set
-            {
-                this._targetDirectory = value;
-
-                if (Directory.Exists(this._targetDirectory))
-                {
-                    this.errorsContainer.ClearErrors(nameof(TargetDirectory));
-                }
-                else
-                {
-                    this.errorsContainer.SetErrors(nameof(TargetDirectory), new[] { Resources.DirectoryNotFoundMessage });
-                }
-            }
-        }
+        public ReactiveProperty<string> TargetDirectory { get; } = new ReactiveProperty<string>(
+            Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)))
+            .SetValidateNotifyError(dir => Directory.Exists(dir) ? null : Resources.DirectoryNotFoundMessage);
 
         /// <summary>
         /// 検索ファイル名を取得または設定する。
         /// </summary>
-        public string FileName { get; set; }
+        public ReactiveProperty<string> FileName { get; } = new ReactiveProperty<string>();
 
         /// <summary>
         /// 検索パターンを取得または設定する。
         /// </summary>
-        public FileNameMatchType MatchType { get; set; } = FileNameMatchType.Wildcard;
+        public ReactiveProperty<FileNameMatchType> MatchType { get; } = new ReactiveProperty<FileNameMatchType>(FileNameMatchType.Wildcard);
 
         /// <summary>
         /// ファイル名検索パターン列挙子
@@ -70,21 +40,15 @@ namespace SearchFile.Wpf.Module.Models
             Regex
         }
 
-        public Condition()
-        {
-            this.errorsContainer = new ErrorsContainer<string>(
-                propertyName => this.ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName)));
-        }
-
         /// <summary>
         /// ファイル検索処理を取得する。
         /// </summary>
         /// <returns>指定されたディレクトリのファイル一覧を返すデリゲート</returns>
         public Func<string, IEnumerable<string>> GetSearchFileStrategy()
         {
-            var fileName = this.FileName;
+            var fileName = this.FileName.Value;
 
-            switch (this.MatchType)
+            switch (this.MatchType.Value)
             {
                 case FileNameMatchType.Wildcard:
                     if (string.IsNullOrWhiteSpace(fileName))

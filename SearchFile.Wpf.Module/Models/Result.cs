@@ -1,5 +1,5 @@
 ﻿using Prism.Mvvm;
-using PropertyChanged;
+using Reactive.Bindings;
 using SearchFile.Wpf.Module.Shell;
 using System.IO;
 using System.Windows.Media;
@@ -9,9 +9,18 @@ namespace SearchFile.Wpf.Module.Models
     /// <summary>
     /// ファイル検索結果を表すクラス
     /// </summary>
-    [AddINotifyPropertyChangedInterface]
     public class Result : BindableBase
     {
+        /// <summary>
+        /// リスト項目が選択されているかどうかを示す値を取得または設定する。
+        /// </summary>
+        public ReactiveProperty<bool> IsSelected { get; } = new ReactiveProperty<bool>();
+
+        /// <summary>
+        /// ファイルパスを取得する。
+        /// </summary>
+        public string FilePath { get; }
+
         /// <summary>
         /// ファイル名を取得する。
         /// </summary>
@@ -28,19 +37,9 @@ namespace SearchFile.Wpf.Module.Models
         public string DirectoryName => Path.GetDirectoryName(this.FilePath);
 
         /// <summary>
-        /// リスト項目が選択されているかどうかを示す値を取得または設定する。
-        /// </summary>
-        public bool IsSelected { get; set; }
-
-        /// <summary>
         /// ファイルに関連付けられたアイコンを取得する。
         /// </summary>
         public ImageSource IconSource => ExtractIcon.ExtractFileIcon(this.FilePath, ExtractIcon.IconSize.Small);
-
-        /// <summary>
-        /// ファイルパスを取得する。
-        /// </summary>
-        public string FilePath { get; }
 
         public Result(string path)
         {

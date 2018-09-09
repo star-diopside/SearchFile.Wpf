@@ -18,11 +18,11 @@ namespace SearchFile.Wpf.Module.Views
         {
             foreach (var result in e.RemovedItems.Cast<Result>())
             {
-                result.IsSelected = false;
+                result.IsSelected.Value = false;
             }
             foreach (var result in e.AddedItems.Cast<Result>())
             {
-                result.IsSelected = true;
+                result.IsSelected.Value = true;
             }
         }
     }

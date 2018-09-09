@@ -1,56 +1,61 @@
 ﻿using CsvHelper;
 using NLog;
 using Prism.Mvvm;
-using PropertyChanged;
+using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SearchFile.Wpf.Module.Models
 {
-    [AddINotifyPropertyChangedInterface]
     public class Searcher : BindableBase
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         public ObservableCollection<Result> Results { get; } = new ObservableCollection<Result>();
 
-        public string SearchingDirectory { get; private set; }
+        public ReadOnlyReactiveProperty<string> SearchingDirectory { get; }
 
-        public bool IsSearching => this.CancellationTokenSource != null;
+        public ReadOnlyReactiveProperty<bool> IsSearching { get; }
 
-        public bool ExistsResults => this.Results.Any();
+        public ReadOnlyReactiveProperty<bool> ExistsResults { get; }
 
-        private CancellationTokenSource CancellationTokenSource { get; set; }
+        private readonly ReactiveProperty<string> latestSearchingDirectory = new ReactiveProperty<string>();
+
+        private readonly ReactiveProperty<CancellationTokenSource> cancellationTokenSource = new ReactiveProperty<CancellationTokenSource>();
 
         public Searcher()
         {
-            this.Results.CollectionChanged += (s, e) => this.RaisePropertyChanged(nameof(ExistsResults));
+            this.SearchingDirectory = this.latestSearchingDirectory.ToReadOnlyReactiveProperty();
+            this.IsSearching = this.cancellationTokenSource.Select(s => s != null).ToReadOnlyReactiveProperty();
+            this.ExistsResults = this.Results.CollectionChangedAsObservable().Select(_ => this.Results.Any()).ToReadOnlyReactiveProperty();
         }
 
         public async Task SearchAsync(Condition condition)
         {
-            if (this.IsSearching)
+            if (this.IsSearching.Value)
             {
                 throw new InvalidOperationException();
             }
 
-            var directoryProgress = new Progress<string>(directory => this.SearchingDirectory = directory);
+            var directoryProgress = new Progress<string>(directory => this.latestSearchingDirectory.Value = directory);
             var resultProgress = new Progress<Result>(this.Results.Add);
 
             this.Results.Clear();
 
             try
             {
-                using (this.CancellationTokenSource = new CancellationTokenSource())
+                using (this.cancellationTokenSource.Value = new CancellationTokenSource())
                 {
-                    var token = this.CancellationTokenSource.Token;
-                    await Task.Run(() => Search(condition.TargetDirectory, condition.GetSearchFileStrategy(),
+                    var token = this.cancellationTokenSource.Value.Token;
+                    await Task.Run(() => Search(condition.TargetDirectory.Value, condition.GetSearchFileStrategy(),
                         directoryProgress, resultProgress, token), token);
                 }
             }
@@ -60,10 +65,10 @@ namespace SearchFile.Wpf.Module.Models
             }
             finally
             {
-                this.CancellationTokenSource = null;
+                this.cancellationTokenSource.Value = null;
             }
 
-            this.SearchingDirectory = null;
+            this.latestSearchingDirectory.Value = null;
         }
 
         private static void Search(string path, Func<string, IEnumerable<string>> strategy,
@@ -93,7 +98,7 @@ namespace SearchFile.Wpf.Module.Models
 
         public void Cancel()
         {
-            this.CancellationTokenSource?.Cancel();
+            this.cancellationTokenSource.Value?.Cancel();
         }
 
         public void Clear()
