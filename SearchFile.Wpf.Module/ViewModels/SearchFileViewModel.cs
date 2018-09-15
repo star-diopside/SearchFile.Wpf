@@ -9,12 +9,15 @@ using SearchFile.Wpf.Module.Messaging;
 using SearchFile.Wpf.Module.Messaging.FileFilters;
 using SearchFile.Wpf.Module.Models;
 using SearchFile.Wpf.Module.Properties;
+using SearchFile.Wpf.Module.Shell;
 using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace SearchFile.Wpf.Module.ViewModels
 {
@@ -23,6 +26,7 @@ namespace SearchFile.Wpf.Module.ViewModels
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private readonly CollectionViewSource resultsViewSource;
         private readonly ReactiveProperty<string> latestStatus = new ReactiveProperty<string>();
+        private readonly ReactiveProperty<bool> isItemsSelected = new ReactiveProperty<bool>();
 
         public SearchFile.Wpf.Module.Models.Condition Condition { get; }
         private Searcher Searcher { get; }
@@ -30,18 +34,21 @@ namespace SearchFile.Wpf.Module.ViewModels
         public ICollectionView ResultsView => this.resultsViewSource.View;
         public ReadOnlyReactiveProperty<bool> IsSearching => this.Searcher.IsSearching;
         public ReadOnlyReactiveProperty<bool> ExistsResults => this.Searcher.ExistsResults;
+        public ReactiveProperty<bool> AutoAdjustColumnWidth { get; } = new ReactiveProperty<bool>(true);
         public ReadOnlyReactiveProperty<string> Status { get; }
-        public ReactiveProperty<bool> RecyclesDeleteFiles { get; set; } = new ReactiveProperty<bool>(true);
+        public ReactiveProperty<bool> RecyclesDeleteFiles { get; } = new ReactiveProperty<bool>(true);
 
-        public DelegateCommand ChooseFolderCommand { get; }
-        public DelegateCommand SearchCommand { get; }
-        public ReactiveCommand ClearResultsCommand { get; }
-        public ReactiveCommand SelectAllCommand { get; }
-        public ReactiveCommand ReverseSelectionCommand { get; }
-        public ReactiveCommand DeleteSelectionFileCommand { get; }
-        public DelegateCommand SaveResultsCommand { get; }
-        public ReactiveCommand CopyResultsCommand { get; }
-        public DelegateCommand<string> SortResultsCommand { get; }
+        public ICommand ResultsViewSelectionChangedCommand { get; }
+        public ICommand ChooseFolderCommand { get; }
+        public ICommand SearchCommand { get; }
+        public ICommand ClearResultsCommand { get; }
+        public ICommand SelectAllCommand { get; }
+        public ICommand ReverseSelectionCommand { get; }
+        public ICommand DeleteSelectionFileCommand { get; }
+        public ICommand SaveResultsCommand { get; }
+        public ICommand CopyResultsCommand { get; }
+        public ICommand SortResultsCommand { get; }
+        public ICommand ShowPropertyCommand { get; }
 
         public InteractionRequest<Notification> ExceptionRequest { get; } = new InteractionRequest<Notification>();
         public InteractionRequest<Notification> ChooseFolderRequest { get; } = new InteractionRequest<Notification>();
@@ -52,36 +59,45 @@ namespace SearchFile.Wpf.Module.ViewModels
         [InjectionConstructor]
         public SearchFileViewModel(SearchFile.Wpf.Module.Models.Condition condition, Searcher searcher)
         {
-            if (condition == null)
-            {
-                throw new ArgumentNullException(nameof(condition));
-            }
-
-            if (searcher == null)
-            {
-                throw new ArgumentNullException(nameof(searcher));
-            }
-
-            this.Condition = condition;
-            this.Searcher = searcher;
+            this.Condition = condition ?? throw new ArgumentNullException(nameof(condition));
+            this.Searcher = searcher ?? throw new ArgumentNullException(nameof(searcher));
             this.resultsViewSource = new CollectionViewSource() { Source = searcher.Results };
 
             searcher.SearchingDirectory.Subscribe(this.SearchingDirectoryChanged);
 
+            this.ResultsViewSelectionChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(this.ResultsViewSelectionChanged);
+
             this.ChooseFolderCommand = new DelegateCommand(this.ChooseFolder);
+
             this.SearchCommand = new DelegateCommand(this.Search);
-            this.ClearResultsCommand = this.IsSearching.Inverse().ToReactiveCommand();
-            this.ClearResultsCommand.Subscribe(this.ClearResults);
-            this.SelectAllCommand = this.ExistsResults.ToReactiveCommand();
-            this.SelectAllCommand.Subscribe(this.SelectAll);
-            this.ReverseSelectionCommand = this.ExistsResults.ToReactiveCommand();
-            this.ReverseSelectionCommand.Subscribe(this.ReverseSelection);
-            this.DeleteSelectionFileCommand = this.ExistsResults.ToReactiveCommand();
-            this.DeleteSelectionFileCommand.Subscribe(this.DeleteSelectionFile);
+
+            var clearResultsCommand = this.IsSearching.Inverse().ToReactiveCommand();
+            clearResultsCommand.Subscribe(this.ClearResults);
+            this.ClearResultsCommand = clearResultsCommand;
+
+            var selectAllCommand = this.ExistsResults.ToReactiveCommand();
+            selectAllCommand.Subscribe(this.SelectAll);
+            this.SelectAllCommand = selectAllCommand;
+
+            var reverseSelectionCommand = this.ExistsResults.ToReactiveCommand();
+            reverseSelectionCommand.Subscribe(this.ReverseSelection);
+            this.ReverseSelectionCommand = reverseSelectionCommand;
+
+            var deleteSelectionFileCommand = this.ExistsResults.ToReactiveCommand();
+            deleteSelectionFileCommand.Subscribe(this.DeleteSelectionFile);
+            this.DeleteSelectionFileCommand = deleteSelectionFileCommand;
+
             this.SaveResultsCommand = new DelegateCommand(this.SaveResults);
-            this.CopyResultsCommand = this.ExistsResults.ToReactiveCommand();
-            this.CopyResultsCommand.Subscribe(this.CopyResults);
+
+            var copyResultsCommand = this.ExistsResults.ToReactiveCommand();
+            copyResultsCommand.Subscribe(this.CopyResults);
+            this.CopyResultsCommand = copyResultsCommand;
+
             this.SortResultsCommand = new DelegateCommand<string>(this.SortResults);
+
+            var showPropertyCommand = this.isItemsSelected.ToReactiveCommand();
+            showPropertyCommand.Subscribe(this.ShowProperty);
+            this.ShowPropertyCommand = showPropertyCommand;
 
             this.Status = this.latestStatus.ToReadOnlyReactiveProperty();
         }
@@ -96,6 +112,20 @@ namespace SearchFile.Wpf.Module.ViewModels
             {
                 this.latestStatus.Value = string.Format(Resources.SearchingDirectoryMessage, directory);
             }
+        }
+
+        private void ResultsViewSelectionChanged(SelectionChangedEventArgs e)
+        {
+            foreach (var result in e.RemovedItems.Cast<Result>())
+            {
+                result.IsSelected.Value = false;
+            }
+            foreach (var result in e.AddedItems.Cast<Result>())
+            {
+                result.IsSelected.Value = true;
+            }
+
+            this.isItemsSelected.Value = this.Searcher.Results.Any(result => result.IsSelected.Value);
         }
 
         private void ChooseFolder()
@@ -120,7 +150,10 @@ namespace SearchFile.Wpf.Module.ViewModels
                 else
                 {
                     await this.Searcher.SearchAsync(this.Condition);
-                    this.AdjustColumnWidthRequest.Raise(new Notification());
+                    if (this.AutoAdjustColumnWidth.Value)
+                    {
+                        this.AdjustColumnWidthRequest.Raise(new Notification());
+                    }
                 }
             }
             catch (Exception ex)
@@ -223,6 +256,18 @@ namespace SearchFile.Wpf.Module.ViewModels
             this.resultsViewSource.SortDescriptions.Clear();
             this.resultsViewSource.SortDescriptions.Add(new SortDescription(propertyName,
                 direction == ListSortDirection.Ascending ? ListSortDirection.Descending : ListSortDirection.Ascending));
+        }
+
+        private void ShowProperty()
+        {
+            var files = from result in this.Searcher.Results
+                        where result.IsSelected.Value
+                        select result.FilePath;
+
+            foreach (var file in files)
+            {
+                FileOperate.ShowPropertyDialog(file);
+            }
         }
     }
 }

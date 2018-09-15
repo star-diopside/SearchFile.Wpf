@@ -142,7 +142,34 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <ListView Grid.RowSpan="3" ItemsSource="{Binding ResultsView}" SelectionChanged="ResultsViewSelectionChanged">
+            <ListView Grid.RowSpan="3" ItemsSource="{Binding ResultsView}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <prism:InvokeCommandAction Command="{Binding ResultsViewSelectionChangedCommand, Mode=OneWay}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="リストのクリア(_C)" Command="{Binding ClearResultsCommand, Mode=OneWay}">
+                            <MenuItem.Icon>
+                                <Rectangle Style="{StaticResource IconStyle}" Width="16" Height="16" Fill="{StaticResource NewFileIcon}"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator/>
+                        <MenuItem Header="検索結果をコピー(_C)" Command="{Binding CopyResultsCommand, Mode=OneWay}">
+                            <MenuItem.Icon>
+                                <Rectangle Style="{StaticResource IconStyle}" Width="16" Height="16" Fill="{StaticResource CopyIcon}"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator/>
+                        <MenuItem Header="すべて選択(_A)" Command="{Binding SelectAllCommand, Mode=OneWay}"/>
+                        <MenuItem Header="選択の切り替え(_R)" Command="{Binding ReverseSelectionCommand, Mode=OneWay}"/>
+                        <Separator/>
+                        <MenuItem Header="検索後に列幅を自動調整する(_W)" IsCheckable="True" IsChecked="{Binding AutoAdjustColumnWidth.Value}"/>
+                        <Separator/>
+                        <MenuItem Header="プロパティの表示(_P)" Command="{Binding ShowPropertyCommand, Mode=OneWay}"/>
+                    </ContextMenu>
+                </ListView.ContextMenu>
                 <ListView.View>
                     <GridView>
                         <i:Interaction.Triggers>
@@ -228,7 +255,7 @@
                     <Button Grid.Row="1" Content="すべて選択" Margin="8,16,4,8" Command="{Binding SelectAllCommand, Mode=OneWay}"/>
                     <Button Grid.Row="1" Grid.Column="1" Content="選択の切り替え" Margin="4,16,8,8" Command="{Binding ReverseSelectionCommand, Mode=OneWay}"/>
                     <Button Grid.Row="2" Grid.ColumnSpan="2" Content="選択ファイルを削除する" Margin="8,8,8,0" Command="{Binding DeleteSelectionFileCommand, Mode=OneWay}"/>
-                    <CheckBox Grid.Row="3" Grid.ColumnSpan="2" Content="削除時にファイルをごみ箱に移す" HorizontalAlignment="Right" Margin="8" IsChecked="{Binding RecyclesDeleteFiles}" IsEnabled="{Binding ExistsResults, Mode=OneWay}"/>
+                    <CheckBox Grid.Row="3" Grid.ColumnSpan="2" Content="削除時にファイルをごみ箱に移す" HorizontalAlignment="Right" Margin="8" IsChecked="{Binding RecyclesDeleteFiles.Value}" IsEnabled="{Binding ExistsResults.Value, Mode=OneWay}"/>
                 </Grid>
             </Border>
         </Grid>

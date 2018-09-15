@@ -1,6 +1,4 @@
-﻿using SearchFile.Wpf.Module.Models;
-using System.Linq;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace SearchFile.Wpf.Module.Views
 {
@@ -12,18 +10,6 @@ namespace SearchFile.Wpf.Module.Views
         public SearchFileView()
         {
             InitializeComponent();
-        }
-
-        private void ResultsViewSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            foreach (var result in e.RemovedItems.Cast<Result>())
-            {
-                result.IsSelected.Value = false;
-            }
-            foreach (var result in e.AddedItems.Cast<Result>())
-            {
-                result.IsSelected.Value = true;
-            }
         }
     }
 }
