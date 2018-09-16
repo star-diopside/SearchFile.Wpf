@@ -90,7 +90,7 @@ namespace SearchFile.Wpf.Module.Models
                     Search(directory, strategy, directoryProgress, resultProgress, token);
                 }
             }
-            catch (Exception ex) when (ex is DirectoryNotFoundException || ex is PathTooLongException || ex is UnauthorizedAccessException)
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
             {
                 logger.Debug(ex, ex.Message);
             }
