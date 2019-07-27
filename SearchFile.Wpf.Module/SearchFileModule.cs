@@ -1,7 +1,8 @@
-﻿using Microsoft.Practices.Unity;
+﻿using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
 using SearchFile.Wpf.Module.Views;
+using Unity;
 
 namespace SearchFile.Wpf.Module
 {
@@ -10,9 +11,13 @@ namespace SearchFile.Wpf.Module
         [Dependency]
         public IRegionManager RegionManager { private get; set; }
 
-        public void Initialize()
+        public void OnInitialized(IContainerProvider containerProvider)
         {
             this.RegionManager.RegisterViewWithRegion("MainRegion", typeof(SearchFileView));
+        }
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
         }
     }
 }

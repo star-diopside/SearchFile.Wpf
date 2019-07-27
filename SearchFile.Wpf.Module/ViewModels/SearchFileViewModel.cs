@@ -1,5 +1,4 @@
-﻿using Microsoft.Practices.Unity;
-using NLog;
+﻿using NLog;
 using Prism.Commands;
 using Prism.Interactivity.InteractionRequest;
 using Prism.Mvvm;
@@ -18,6 +17,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using Unity;
 
 namespace SearchFile.Wpf.Module.ViewModels
 {

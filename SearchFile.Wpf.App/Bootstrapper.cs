@@ -1,9 +1,9 @@
-﻿using Microsoft.Practices.Unity;
-using Prism.Modularity;
+﻿using Prism.Modularity;
 using Prism.Unity;
 using SearchFile.Wpf.App.Views;
 using SearchFile.Wpf.Module;
 using System.Windows;
+using Unity;
 
 namespace SearchFile.Wpf.App
 {
