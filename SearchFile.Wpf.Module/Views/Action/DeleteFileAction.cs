@@ -11,9 +11,7 @@ namespace SearchFile.Wpf.Module.Views.Action
     {
         protected override void Invoke(object parameter)
         {
-            var args = parameter as InteractionRequestedEventArgs;
-            var message = args?.Context?.Content as DeleteFileMessage;
-            if (message == null)
+            if (!(parameter is InteractionRequestedEventArgs args && args.Context?.Content is DeleteFileMessage message))
             {
                 return;
             }

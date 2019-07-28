@@ -12,9 +12,7 @@ namespace SearchFile.Wpf.Module.Views.Action
     {
         protected override void Invoke(object parameter)
         {
-            var args = parameter as InteractionRequestedEventArgs;
-            var ex = args?.Context?.Content as Exception;
-            if (ex == null)
+            if (!(parameter is InteractionRequestedEventArgs args && args.Context?.Content is Exception ex))
             {
                 return;
             }

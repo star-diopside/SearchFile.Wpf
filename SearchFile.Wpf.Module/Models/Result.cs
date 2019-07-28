@@ -24,17 +24,17 @@ namespace SearchFile.Wpf.Module.Models
         /// <summary>
         /// ファイル名を取得する。
         /// </summary>
-        public string FileName => Path.GetFileName(this.FilePath);
+        public string? FileName => Path.GetFileName(this.FilePath);
 
         /// <summary>
         /// 拡張子を取得する。
         /// </summary>
-        public string Extension => Path.GetExtension(this.FilePath);
+        public string? Extension => Path.GetExtension(this.FilePath);
 
         /// <summary>
         /// ディレクトリ名を取得する。
         /// </summary>
-        public string DirectoryName => Path.GetDirectoryName(this.FilePath);
+        public string? DirectoryName => Path.GetDirectoryName(this.FilePath);
 
         /// <summary>
         /// ファイルに関連付けられたアイコンを取得する。

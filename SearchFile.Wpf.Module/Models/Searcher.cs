@@ -65,10 +65,10 @@ namespace SearchFile.Wpf.Module.Models
             }
             finally
             {
-                this.cancellationTokenSource.Value = null;
+                this.cancellationTokenSource.Value = null!;
             }
 
-            this.latestSearchingDirectory.Value = null;
+            this.latestSearchingDirectory.Value = null!;
         }
 
         private static void Search(string path, Func<string, IEnumerable<string>> strategy,
@@ -108,7 +108,7 @@ namespace SearchFile.Wpf.Module.Models
 
         public void Save(string fileName)
         {
-            switch (Path.GetExtension(fileName).ToLower())
+            switch (Path.GetExtension(fileName)?.ToLower())
             {
                 case ".csv":
                     SaveCsv(fileName);

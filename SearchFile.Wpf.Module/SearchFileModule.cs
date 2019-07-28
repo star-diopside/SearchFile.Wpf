@@ -2,18 +2,21 @@
 using Prism.Modularity;
 using Prism.Regions;
 using SearchFile.Wpf.Module.Views;
-using Unity;
 
 namespace SearchFile.Wpf.Module
 {
     public class SearchFileModule : IModule
     {
-        [Dependency]
-        public IRegionManager RegionManager { private get; set; }
+        private readonly IRegionManager _regionManager;
+
+        public SearchFileModule(IRegionManager regionManager)
+        {
+            _regionManager = regionManager;
+        }
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            this.RegionManager.RegisterViewWithRegion("MainRegion", typeof(SearchFileView));
+            _regionManager.RegisterViewWithRegion("MainRegion", typeof(SearchFileView));
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)

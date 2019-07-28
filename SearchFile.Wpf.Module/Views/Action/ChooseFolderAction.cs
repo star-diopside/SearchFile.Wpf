@@ -10,23 +10,19 @@ namespace SearchFile.Wpf.Module.Views.Action
     {
         protected override void Invoke(object parameter)
         {
-            var args = parameter as InteractionRequestedEventArgs;
-            var message = args?.Context?.Content as ChooseFolderMessage;
-            if (message == null)
+            if (!(parameter is InteractionRequestedEventArgs args && args.Context?.Content is ChooseFolderMessage message))
             {
                 return;
             }
 
-            using (var dialog = new CommonOpenFileDialog())
-            {
-                dialog.IsFolderPicker = true;
-                dialog.InitialDirectory = message.Path;
+            using var dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = true;
+            dialog.InitialDirectory = message.Path;
 
-                if (dialog.ShowDialog(Window.GetWindow(this.AssociatedObject)) == CommonFileDialogResult.Ok)
-                {
-                    message.Path = dialog.FileName;
-                    args.Callback();
-                }
+            if (dialog.ShowDialog(Window.GetWindow(this.AssociatedObject)) == CommonFileDialogResult.Ok)
+            {
+                message.Path = dialog.FileName;
+                args.Callback();
             }
         }
     }

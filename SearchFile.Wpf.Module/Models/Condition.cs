@@ -18,7 +18,7 @@ namespace SearchFile.Wpf.Module.Models
         /// 検索対象ディレクトリを取得または設定する。
         /// </summary>
         public ReactiveProperty<string> TargetDirectory { get; } = new ReactiveProperty<string>(
-            Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)))
+            Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System))!)
             .SetValidateNotifyError(dir => Directory.Exists(dir) ? null : Resources.DirectoryNotFoundMessage);
 
         /// <summary>

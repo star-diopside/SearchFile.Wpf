@@ -4,7 +4,7 @@ namespace SearchFile.Wpf.Module.Messaging.FileFilters
 {
     public class Filter : IFilter
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public ICollection<string> Patterns { get; set; } = new List<string>();
         IEnumerable<string> IFilter.Patterns => this.Patterns;
     }
