@@ -17,7 +17,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using Unity;
 
 namespace SearchFile.Wpf.Module.ViewModels
 {
@@ -56,7 +55,6 @@ namespace SearchFile.Wpf.Module.ViewModels
         public InteractionRequest<Notification> DeleteFileRequest { get; } = new InteractionRequest<Notification>();
         public InteractionRequest<Notification> SaveFileRequest { get; } = new InteractionRequest<Notification>();
 
-        [InjectionConstructor]
         public SearchFileViewModel(SearchFile.Wpf.Module.Models.Condition condition, Searcher searcher)
         {
             this.Condition = condition ?? throw new ArgumentNullException(nameof(condition));
