@@ -12,6 +12,7 @@ using SearchFile.Wpf.Module.Shell;
 using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,14 +21,15 @@ using System.Windows.Input;
 
 namespace SearchFile.Wpf.Module.ViewModels
 {
-    public class SearchFileViewModel : BindableBase
+    public class SearchFileViewModel : BindableBase, IDisposable
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly CompositeDisposable _disposable = new CompositeDisposable();
         private readonly CollectionViewSource resultsViewSource;
         private readonly ReactiveProperty<string> latestStatus = new ReactiveProperty<string>();
         private readonly ReactiveProperty<bool> isItemsSelected = new ReactiveProperty<bool>();
 
-        public SearchFile.Wpf.Module.Models.Condition Condition { get; }
+        public Models.Condition Condition { get; }
         private Searcher Searcher { get; }
 
         public ICollectionView ResultsView => this.resultsViewSource.View;
@@ -55,49 +57,38 @@ namespace SearchFile.Wpf.Module.ViewModels
         public InteractionRequest<Notification> DeleteFileRequest { get; } = new InteractionRequest<Notification>();
         public InteractionRequest<Notification> SaveFileRequest { get; } = new InteractionRequest<Notification>();
 
-        public SearchFileViewModel(SearchFile.Wpf.Module.Models.Condition condition, Searcher searcher)
+        public SearchFileViewModel(Models.Condition condition, Searcher searcher)
         {
             this.Condition = condition ?? throw new ArgumentNullException(nameof(condition));
             this.Searcher = searcher ?? throw new ArgumentNullException(nameof(searcher));
             this.resultsViewSource = new CollectionViewSource() { Source = searcher.Results };
 
-            searcher.SearchingDirectory.Subscribe(this.SearchingDirectoryChanged);
+            searcher.SearchingDirectory.Subscribe(this.SearchingDirectoryChanged).AddTo(_disposable);
+
+            ReactiveCommand ToReactiveCommand(Action execute, IObservable<bool> canExecute)
+            {
+                var command = canExecute.ToReactiveCommand();
+                command.Subscribe(execute).AddTo(_disposable);
+                return command;
+            }
 
             this.ResultsViewSelectionChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(this.ResultsViewSelectionChanged);
-
             this.ChooseFolderCommand = new DelegateCommand(this.ChooseFolder);
-
             this.SearchCommand = new DelegateCommand(this.Search);
-
-            var clearResultsCommand = this.IsSearching.Inverse().ToReactiveCommand();
-            clearResultsCommand.Subscribe(this.ClearResults);
-            this.ClearResultsCommand = clearResultsCommand;
-
-            var selectAllCommand = this.ExistsResults.ToReactiveCommand();
-            selectAllCommand.Subscribe(this.SelectAll);
-            this.SelectAllCommand = selectAllCommand;
-
-            var reverseSelectionCommand = this.ExistsResults.ToReactiveCommand();
-            reverseSelectionCommand.Subscribe(this.ReverseSelection);
-            this.ReverseSelectionCommand = reverseSelectionCommand;
-
-            var deleteSelectionFileCommand = this.ExistsResults.ToReactiveCommand();
-            deleteSelectionFileCommand.Subscribe(this.DeleteSelectionFile);
-            this.DeleteSelectionFileCommand = deleteSelectionFileCommand;
-
+            this.ClearResultsCommand = ToReactiveCommand(this.ClearResults, this.IsSearching.Inverse());
+            this.SelectAllCommand = ToReactiveCommand(this.SelectAll, this.ExistsResults);
+            this.ReverseSelectionCommand = ToReactiveCommand(this.ReverseSelection, this.ExistsResults);
+            this.DeleteSelectionFileCommand = ToReactiveCommand(this.DeleteSelectionFile, this.ExistsResults);
             this.SaveResultsCommand = new DelegateCommand(this.SaveResults);
-
-            var copyResultsCommand = this.ExistsResults.ToReactiveCommand();
-            copyResultsCommand.Subscribe(this.CopyResults);
-            this.CopyResultsCommand = copyResultsCommand;
-
+            this.CopyResultsCommand = ToReactiveCommand(this.CopyResults, this.ExistsResults);
             this.SortResultsCommand = new DelegateCommand<string>(this.SortResults);
-
-            var showPropertyCommand = this.isItemsSelected.ToReactiveCommand();
-            showPropertyCommand.Subscribe(this.ShowProperty);
-            this.ShowPropertyCommand = showPropertyCommand;
-
+            this.ShowPropertyCommand = ToReactiveCommand(this.ShowProperty, this.isItemsSelected);
             this.Status = this.latestStatus.ToReadOnlyReactiveProperty();
+        }
+
+        public void Dispose()
+        {
+            _disposable.Dispose();
         }
 
         private void SearchingDirectoryChanged(string directory)
