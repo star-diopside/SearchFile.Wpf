@@ -8,7 +8,7 @@ namespace SearchFile.Wpf.Module.Interop.ShellObjects
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     internal interface IFileOperation
     {
-        uint Advise(IFileOperationProgressSink pfops);
+        uint Advise(IFileOperationProgressSink? pfops);
 
         void Unadvise(uint dwCookie);
 
@@ -32,7 +32,7 @@ namespace SearchFile.Wpf.Module.Interop.ShellObjects
         void RenameItem(
             IShellItem psiItem,
             [MarshalAs(UnmanagedType.LPWStr)] string pszNewName,
-            IFileOperationProgressSink pfopsItem);
+            IFileOperationProgressSink? pfopsItem);
 
         void RenameItems(
             [MarshalAs(UnmanagedType.IUnknown)] object pUnkItems,
@@ -42,7 +42,7 @@ namespace SearchFile.Wpf.Module.Interop.ShellObjects
             IShellItem psiItem,
             IShellItem psiDestinationFolder,
             [MarshalAs(UnmanagedType.LPWStr)] string pszNewName,
-            IFileOperationProgressSink pfopsItem);
+            IFileOperationProgressSink? pfopsItem);
 
         void MoveItems(
             [MarshalAs(UnmanagedType.IUnknown)] object punkItems,
@@ -52,7 +52,7 @@ namespace SearchFile.Wpf.Module.Interop.ShellObjects
             IShellItem psiItem,
             IShellItem psiDestinationFolder,
             [MarshalAs(UnmanagedType.LPWStr)] string pszCopyName,
-            IFileOperationProgressSink pfopsItem);
+            IFileOperationProgressSink? pfopsItem);
 
         void CopyItems(
             [MarshalAs(UnmanagedType.IUnknown)] object punkItems,
@@ -60,7 +60,7 @@ namespace SearchFile.Wpf.Module.Interop.ShellObjects
 
         void DeleteItem(
             IShellItem psiItem,
-            IFileOperationProgressSink pfopsItem);
+            IFileOperationProgressSink? pfopsItem);
 
         void DeleteItems(
             [MarshalAs(UnmanagedType.IUnknown)] object punkItems);
@@ -70,7 +70,7 @@ namespace SearchFile.Wpf.Module.Interop.ShellObjects
             uint dwFileAttributes,
             [MarshalAs(UnmanagedType.LPWStr)] string pszName,
             [MarshalAs(UnmanagedType.LPWStr)] string pszTemplateName,
-            IFileOperationProgressSink pfopsItem);
+            IFileOperationProgressSink? pfopsItem);
 
         void PerformOperations();
 

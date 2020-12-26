@@ -9,7 +9,7 @@ namespace SearchFile.Wpf.Module.Interop
         [DllImport("shell32.dll", CharSet = CharSet.Unicode, PreserveSig = false, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Interface)]
         internal static extern object SHCreateItemFromParsingName(
-            [MarshalAs(UnmanagedType.LPWStr)] string pszPath, IBindCtx pbc, [In] ref Guid riid);
+            [MarshalAs(UnmanagedType.LPWStr)] string pszPath, IBindCtx? pbc, [In] ref Guid riid);
 
         [DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern IntPtr SHGetFileInfo([MarshalAs(UnmanagedType.LPWStr)] string pszPath,

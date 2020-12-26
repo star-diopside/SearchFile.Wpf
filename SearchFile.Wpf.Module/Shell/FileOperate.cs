@@ -1,5 +1,4 @@
-﻿using NLog;
-using SearchFile.Wpf.Module.Interop;
+﻿using SearchFile.Wpf.Module.Interop;
 using SearchFile.Wpf.Module.Interop.ShellObjects;
 using System;
 using System.Collections.Generic;
@@ -16,8 +15,6 @@ namespace SearchFile.Wpf.Module.Shell
     /// </summary>
     static class FileOperate
     {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-
         /// <summary>
         /// 複数のファイルを削除する
         /// </summary>
@@ -36,7 +33,7 @@ namespace SearchFile.Wpf.Module.Shell
         /// <param name="files">削除するファイルのリスト</param>
         /// <param name="recycle">ファイルをごみ箱に移動する場合はtrue、完全に削除する場合はfalse</param>
         /// <returns>処理がすべて完了した場合はtrue、処理がキャンセルされた場合はfalse</returns>
-        public static bool DeleteFiles(Window owner, IEnumerable<string> files, bool recycle)
+        public static bool DeleteFiles(Window? owner, IEnumerable<string> files, bool recycle)
         {
             var fo = (IFileOperation)new FileOperation();
 
@@ -48,14 +45,7 @@ namespace SearchFile.Wpf.Module.Shell
                 fo.DeleteItem(InteropHelpers.CreateShellItem(file), null);
             }
 
-            try
-            {
-                fo.PerformOperations();
-            }
-            catch (COMException ex)
-            {
-                logger.Warn(ex, ex.Message);
-            }
+            fo.PerformOperations();
 
             return !fo.GetAnyOperationsAborted();
         }
@@ -71,20 +61,20 @@ namespace SearchFile.Wpf.Module.Shell
             public ShellExecuteMaskFlag fMask;
             public IntPtr hwnd;
             [MarshalAs(UnmanagedType.LPTStr)]
-            public string lpVerb;
+            public string? lpVerb;
             [MarshalAs(UnmanagedType.LPTStr)]
-            public string lpFile;
+            public string? lpFile;
             [MarshalAs(UnmanagedType.LPTStr)]
-            public string lpParameters;
+            public string? lpParameters;
             [MarshalAs(UnmanagedType.LPTStr)]
-            public string lpDirectory;
+            public string? lpDirectory;
             public int nShow;
             public IntPtr hInstApp;
 
             // Optional fields
             public IntPtr lpIDList;
             [MarshalAs(UnmanagedType.LPTStr)]
-            public string lpClass;
+            public string? lpClass;
             public IntPtr hkeyClass;
             public uint dwHotKey;
             public IntPtr hIcon;
@@ -178,7 +168,7 @@ namespace SearchFile.Wpf.Module.Shell
         /// </summary>
         /// <param name="owner">ダイアログボックスを所有するウィンドウ</param>
         /// <param name="fileName">プロパティを表示するファイル名</param>
-        public static void ShowPropertyDialog(Window owner, string fileName)
+        public static void ShowPropertyDialog(Window? owner, string fileName)
         {
             var info = new SHELLEXECUTEINFO();
 

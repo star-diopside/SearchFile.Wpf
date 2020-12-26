@@ -17,19 +17,19 @@ namespace SearchFile.Wpf.Module.Models
         /// <summary>
         /// 検索対象ディレクトリを取得または設定する。
         /// </summary>
-        public ReactiveProperty<string> TargetDirectory { get; } = new ReactiveProperty<string>(
-            Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)))
-            .SetValidateNotifyError(dir => Directory.Exists(dir) ? null : Resources.DirectoryNotFoundMessage);
+        public ReactiveProperty<string?> TargetDirectory { get; } = new ReactiveProperty<string?>(
+            Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System))
+        ).SetValidateNotifyError(dir => Directory.Exists(dir) ? null : Resources.DirectoryNotFoundMessage);
 
         /// <summary>
         /// 検索ファイル名を取得または設定する。
         /// </summary>
-        public ReactiveProperty<string> FileName { get; } = new ReactiveProperty<string>();
+        public ReactiveProperty<string?> FileName { get; } = new();
 
         /// <summary>
         /// 検索パターンを取得または設定する。
         /// </summary>
-        public ReactiveProperty<FileNameMatchType> MatchType { get; } = new ReactiveProperty<FileNameMatchType>(FileNameMatchType.Wildcard);
+        public ReactiveProperty<FileNameMatchType> MatchType { get; } = new(FileNameMatchType.Wildcard);
 
         /// <summary>
         /// ファイル名検索パターン列挙子
@@ -46,26 +46,27 @@ namespace SearchFile.Wpf.Module.Models
         /// <returns>指定されたディレクトリのファイル一覧を返すデリゲート</returns>
         public Func<string, IEnumerable<string>> GetSearchFileStrategy()
         {
-            var fileName = this.FileName.Value;
+            var fileName = FileName.Value;
+            var matchType = MatchType.Value;
 
-            switch (this.MatchType.Value)
+            if (string.IsNullOrWhiteSpace(fileName))
             {
-                case FileNameMatchType.Wildcard:
-                    if (string.IsNullOrWhiteSpace(fileName))
-                    {
-                        return Directory.EnumerateFiles;
-                    }
-                    else
-                    {
-                        return path => Directory.EnumerateFiles(path, fileName);
-                    }
-                case FileNameMatchType.Regex:
-                    var pattern = new Regex(fileName, RegexOptions.IgnoreCase | RegexOptions.Singleline);
-                    return path => from file in Directory.EnumerateFiles(path)
-                                   where pattern.IsMatch(file)
-                                   select file;
-                default:
-                    throw new InvalidOperationException();
+                return Directory.EnumerateFiles;
+            }
+            else if (matchType == FileNameMatchType.Wildcard)
+            {
+                return path => Directory.EnumerateFiles(path, fileName);
+            }
+            else if (matchType == FileNameMatchType.Regex)
+            {
+                var pattern = new Regex(fileName, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+                return path => from file in Directory.EnumerateFiles(path)
+                               where pattern.IsMatch(file)
+                               select file;
+            }
+            else
+            {
+                throw new InvalidOperationException();
             }
         }
     }

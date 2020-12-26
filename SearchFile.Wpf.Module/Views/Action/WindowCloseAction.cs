@@ -1,5 +1,5 @@
-﻿using System.Windows;
-using System.Windows.Interactivity;
+﻿using Microsoft.Xaml.Behaviors;
+using System.Windows;
 
 namespace SearchFile.Wpf.Module.Views.Action
 {
@@ -7,7 +7,7 @@ namespace SearchFile.Wpf.Module.Views.Action
     {
         protected override void Invoke(object parameter)
         {
-            Window.GetWindow(this.AssociatedObject).Close();
+            Window.GetWindow(AssociatedObject).Close();
         }
     }
 }

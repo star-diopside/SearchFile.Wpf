@@ -31,11 +31,9 @@ namespace SearchFile.Wpf.Module.Views.Converter
             return paramEnum;
         }
 
-        private object ParseParameterEnum(Type enumType, object parameter)
+        private object? ParseParameterEnum(Type enumType, object parameter)
         {
-            var paramString = parameter as string;
-
-            if (paramString == null || !Enum.IsDefined(enumType, paramString))
+            if (!(parameter is string paramString) || !Enum.IsDefined(enumType, paramString))
             {
                 return null;
             }
