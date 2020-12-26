@@ -1,5 +1,4 @@
-﻿using NLog;
-using SearchFile.Wpf.Module.Interop;
+﻿using SearchFile.Wpf.Module.Interop;
 using SearchFile.Wpf.Module.Interop.ShellObjects;
 using System;
 using System.Collections.Generic;
@@ -16,8 +15,6 @@ namespace SearchFile.Wpf.Module.Shell
     /// </summary>
     static class FileOperate
     {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-
         /// <summary>
         /// 複数のファイルを削除する
         /// </summary>
@@ -48,14 +45,7 @@ namespace SearchFile.Wpf.Module.Shell
                 fo.DeleteItem(InteropHelpers.CreateShellItem(file), null);
             }
 
-            try
-            {
-                fo.PerformOperations();
-            }
-            catch (COMException ex)
-            {
-                logger.Warn(ex, ex.Message);
-            }
+            fo.PerformOperations();
 
             return !fo.GetAnyOperationsAborted();
         }

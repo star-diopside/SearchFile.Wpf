@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SearchFile.Wpf.Module.Messaging.FileFilters
+namespace SearchFile.Wpf.Module.Services.FileFilters
 {
     public class CsvFileFilter : IFilter
     {

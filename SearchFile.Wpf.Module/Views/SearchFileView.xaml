@@ -2,9 +2,9 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:action="clr-namespace:SearchFile.Wpf.Module.Views.Action"
              xmlns:converter="clr-namespace:SearchFile.Wpf.Module.Views.Converter"
              xmlns:vm="clr-namespace:SearchFile.Wpf.Module.ViewModels"
@@ -43,20 +43,6 @@
             <converter:EnumBooleanConverter x:Key="EnumBooleanConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
-    <i:Interaction.Triggers>
-        <prism:InteractionRequestTrigger SourceObject="{Binding ExceptionRequest, Mode=OneWay}">
-            <action:ExceptionAction/>
-        </prism:InteractionRequestTrigger>
-        <prism:InteractionRequestTrigger SourceObject="{Binding ChooseFolderRequest, Mode=OneWay}">
-            <action:ChooseFolderAction/>
-        </prism:InteractionRequestTrigger>
-        <prism:InteractionRequestTrigger SourceObject="{Binding DeleteFileRequest, Mode=OneWay}">
-            <action:DeleteFileAction/>
-        </prism:InteractionRequestTrigger>
-        <prism:InteractionRequestTrigger SourceObject="{Binding SaveFileRequest, Mode=OneWay}">
-            <action:SaveFileAction/>
-        </prism:InteractionRequestTrigger>
-    </i:Interaction.Triggers>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="ファイル(_F)">
@@ -78,11 +64,11 @@
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="終了(_X)">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
+                    <behaviors:Interaction.Triggers>
+                        <behaviors:EventTrigger EventName="Click">
                             <action:WindowCloseAction/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
+                        </behaviors:EventTrigger>
+                    </behaviors:Interaction.Triggers>
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="編集(_E)">
@@ -143,11 +129,11 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <ListView Grid.RowSpan="3" ItemsSource="{Binding ResultsView}">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectionChanged">
+                <behaviors:Interaction.Triggers>
+                    <behaviors:EventTrigger EventName="SelectionChanged">
                         <prism:InvokeCommandAction Command="{Binding ResultsViewSelectionChangedCommand, Mode=OneWay}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
+                    </behaviors:EventTrigger>
+                </behaviors:Interaction.Triggers>
                 <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="リストのクリア(_C)" Command="{Binding ClearResultsCommand, Mode=OneWay}">
@@ -172,11 +158,11 @@
                 </ListView.ContextMenu>
                 <ListView.View>
                     <GridView>
-                        <i:Interaction.Triggers>
-                            <prism:InteractionRequestTrigger SourceObject="{Binding AdjustColumnWidthRequest, Mode=OneWay}">
-                                <action:AdjustColumnWidthAction/>
-                            </prism:InteractionRequestTrigger>
-                        </i:Interaction.Triggers>
+                        <behaviors:Interaction.Triggers>
+                            <behaviors:PropertyChangedTrigger Binding="{Binding IsSearching.Value}">
+                                <action:AdjustColumnWidthAction AutoAdjustColumnWidth="{Binding AutoAdjustColumnWidth.Value}"/>
+                            </behaviors:PropertyChangedTrigger>
+                        </behaviors:Interaction.Triggers>
                         <GridViewColumn>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -209,13 +195,13 @@
                         <TextBlock Text="検索条件" Padding="4,2" Style="{DynamicResource ActiveCaptionTextBlockStyle}"/>
                     </Border>
                     <Label Content="ディレクトリ名(_D):" Target="{Binding ElementName=directoryName, Mode=OneWay}" Padding="0" Margin="8,8,8,0"/>
-                    <TextBox x:Name="directoryName" Margin="8,0" Text="{Binding Condition.TargetDirectory.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox x:Name="directoryName" Margin="8,0" Text="{Binding TargetDirectory.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     <Button Content="ディレクトリの選択" Margin="8" HorizontalAlignment="Right" IsDefault="{Binding IsFocused, ElementName=directoryName, Mode=OneWay}" Command="{Binding ChooseFolderCommand, Mode=OneWay}"/>
                     <Label Content="ファイル名(_F):" Target="{Binding ElementName=fileName, Mode=OneWay}" Padding="0" Margin="8,0"/>
-                    <TextBox x:Name="fileName" Margin="8,0,8,8" Text="{Binding Condition.FileName.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox x:Name="fileName" Margin="8,0,8,8" Text="{Binding FileName.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     <StackPanel Orientation="Horizontal" Margin="8,0" HorizontalAlignment="Center">
-                        <RadioButton Content="ワイルドカード" Margin="8,0" HorizontalAlignment="Center" IsChecked="{Binding Condition.MatchType.Value, ConverterParameter=Wildcard, Converter={StaticResource EnumBooleanConverter}}"/>
-                        <RadioButton Content="正規表現" Margin="8,0" HorizontalAlignment="Center" IsChecked="{Binding Condition.MatchType.Value, ConverterParameter=Regex, Converter={StaticResource EnumBooleanConverter}}"/>
+                        <RadioButton Content="ワイルドカード" Margin="8,0" HorizontalAlignment="Center" IsChecked="{Binding MatchType.Value, ConverterParameter=Wildcard, Converter={StaticResource EnumBooleanConverter}}"/>
+                        <RadioButton Content="正規表現" Margin="8,0" HorizontalAlignment="Center" IsChecked="{Binding MatchType.Value, ConverterParameter=Regex, Converter={StaticResource EnumBooleanConverter}}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="8,16,8,0" HorizontalAlignment="Right">
                         <Button IsDefault="{Binding IsFocused, Converter={StaticResource BooleanNegationConverter}, ElementName=directoryName, Mode=OneWay}" Command="{Binding SearchCommand, Mode=OneWay}">

@@ -1,15 +1,15 @@
 ﻿using CsvHelper;
-using NLog;
+using Microsoft.Extensions.Logging;
 using Prism.Mvvm;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,61 +17,62 @@ namespace SearchFile.Wpf.Module.Models
 {
     public class Searcher : BindableBase
     {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly ILogger<Searcher> _logger;
 
-        public ObservableCollection<Result> Results { get; } = new ObservableCollection<Result>();
+        private readonly ReactiveProperty<string?> _latestSearchingDirectory = new();
+        private readonly ReactiveProperty<CancellationTokenSource?> _cancellationTokenSource = new();
 
-        public ReadOnlyReactiveProperty<string> SearchingDirectory { get; }
+        public ObservableCollection<Result> Results { get; } = new();
+
+        public ReadOnlyReactiveProperty<string?> SearchingDirectory { get; }
 
         public ReadOnlyReactiveProperty<bool> IsSearching { get; }
 
         public ReadOnlyReactiveProperty<bool> ExistsResults { get; }
 
-        private readonly ReactiveProperty<string> latestSearchingDirectory = new ReactiveProperty<string>();
-
-        private readonly ReactiveProperty<CancellationTokenSource> cancellationTokenSource = new ReactiveProperty<CancellationTokenSource>();
-
-        public Searcher()
+        public Searcher(ILogger<Searcher> logger)
         {
-            this.SearchingDirectory = this.latestSearchingDirectory.ToReadOnlyReactiveProperty();
-            this.IsSearching = this.cancellationTokenSource.Select(s => s != null).ToReadOnlyReactiveProperty();
-            this.ExistsResults = this.Results.CollectionChangedAsObservable().Select(_ => this.Results.Any()).ToReadOnlyReactiveProperty();
+            _logger = logger;
+
+            SearchingDirectory = _latestSearchingDirectory.ToReadOnlyReactiveProperty();
+            IsSearching = _cancellationTokenSource.Select(s => s != null).ToReadOnlyReactiveProperty();
+            ExistsResults = Results.CollectionChangedAsObservable().Select(_ => Results.Any()).ToReadOnlyReactiveProperty();
         }
 
         public async Task SearchAsync(Condition condition)
         {
-            if (this.IsSearching.Value)
+            if (IsSearching.Value || condition.TargetDirectory.Value is not string targetDirectory)
             {
                 throw new InvalidOperationException();
             }
 
-            var directoryProgress = new Progress<string>(directory => this.latestSearchingDirectory.Value = directory);
-            var resultProgress = new Progress<Result>(this.Results.Add);
+            var directoryProgress = new Progress<string>(directory => _latestSearchingDirectory.Value = directory);
+            var resultProgress = new Progress<Result>(Results.Add);
 
-            this.Results.Clear();
+            Results.Clear();
 
             try
             {
-                using (this.cancellationTokenSource.Value = new CancellationTokenSource())
+                using (_cancellationTokenSource.Value = new())
                 {
-                    var token = this.cancellationTokenSource.Value.Token;
-                    await Task.Run(() => Search(condition.TargetDirectory.Value, condition.GetSearchFileStrategy(),
+                    var token = _cancellationTokenSource.Value.Token;
+                    await Task.Run(() => Search(targetDirectory, condition.GetSearchFileStrategy(),
                         directoryProgress, resultProgress, token), token);
                 }
             }
             catch (OperationCanceledException ex)
             {
-                logger.Debug(ex, ex.Message);
+                _logger.LogDebug(ex, ex.Message);
             }
             finally
             {
-                this.cancellationTokenSource.Value = null!;
+                _cancellationTokenSource.Value = null;
             }
 
-            this.latestSearchingDirectory.Value = null!;
+            _latestSearchingDirectory.Value = null;
         }
 
-        private static void Search(string path, Func<string, IEnumerable<string>> strategy,
+        private void Search(string path, Func<string, IEnumerable<string>> strategy,
             IProgress<string> directoryProgress, IProgress<Result> resultProgress, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
@@ -92,23 +93,23 @@ namespace SearchFile.Wpf.Module.Models
             }
             catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
             {
-                logger.Debug(ex, ex.Message);
+                _logger.LogDebug(ex, ex.Message);
             }
         }
 
         public void Cancel()
         {
-            this.cancellationTokenSource.Value?.Cancel();
+            _cancellationTokenSource.Value?.Cancel();
         }
 
         public void Clear()
         {
-            this.Results.Clear();
+            Results.Clear();
         }
 
         public void Save(string fileName)
         {
-            switch (Path.GetExtension(fileName)?.ToLower())
+            switch (Path.GetExtension(fileName).ToLower())
             {
                 case ".csv":
                     SaveCsv(fileName);
@@ -121,31 +122,24 @@ namespace SearchFile.Wpf.Module.Models
 
         private void SaveCsv(string fileName)
         {
-            using (var writer = new CsvWriter(new StreamWriter(fileName, false, Encoding.UTF8)))
-            {
-                writer.WriteField("DirectoryName");
-                writer.WriteField("FileName");
-                writer.WriteField("Extension");
-                writer.NextRecord();
+            using var writer = new StreamWriter(fileName);
+            using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
 
-                foreach (var result in this.Results)
-                {
-                    writer.WriteField(result.DirectoryName);
-                    writer.WriteField(result.FileName);
-                    writer.WriteField(result.Extension);
-                    writer.NextRecord();
-                }
-            }
+            csv.WriteRecords(Results.Select(result => new
+            {
+                result.DirectoryName,
+                result.FileName,
+                result.Extension
+            }));
         }
 
         private void SaveText(string fileName)
         {
-            using (var writer = new StreamWriter(fileName, false, Encoding.UTF8))
+            using var writer = new StreamWriter(fileName);
+
+            foreach (var result in Results)
             {
-                foreach (var result in this.Results)
-                {
-                    writer.WriteLine(result.FilePath);
-                }
+                writer.WriteLine(result.FilePath);
             }
         }
     }
