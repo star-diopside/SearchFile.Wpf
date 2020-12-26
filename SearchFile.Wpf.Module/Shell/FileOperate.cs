@@ -37,7 +37,7 @@ namespace SearchFile.Wpf.Module.Shell
         {
             var fo = (IFileOperation)new FileOperation();
 
-            fo.SetOwnerWindow(owner == null ? IntPtr.Zero : new WindowInteropHelper(owner).Handle);
+            fo.SetOwnerWindow(owner is null ? IntPtr.Zero : new WindowInteropHelper(owner).Handle);
             fo.SetOperationFlags(recycle ? FileOperationFlags.FOF_ALLOWUNDO : 0);
 
             foreach (var file in files)
@@ -174,7 +174,7 @@ namespace SearchFile.Wpf.Module.Shell
 
             info.cbSize = (uint)Marshal.SizeOf(info);
             info.fMask = ShellExecuteMaskFlag.SEE_MASK_INVOKEIDLIST | ShellExecuteMaskFlag.SEE_MASK_FLAG_NO_UI;
-            info.hwnd = (owner == null ? IntPtr.Zero : new WindowInteropHelper(owner).Handle);
+            info.hwnd = (owner is null ? IntPtr.Zero : new WindowInteropHelper(owner).Handle);
             info.lpFile = fileName;
             info.lpVerb = "properties";
             info.lpParameters = null;
@@ -185,21 +185,15 @@ namespace SearchFile.Wpf.Module.Shell
             if (!ShellExecuteEx(ref info))
             {
                 // エラーコードに応じた例外をスローする
-                switch ((ShellExecuteErrors)Marshal.GetLastWin32Error())
+                throw (ShellExecuteErrors)Marshal.GetLastWin32Error() switch
                 {
-                    case ShellExecuteErrors.SE_ERR_FNF:
-                        throw new FileNotFoundException();
-                    case ShellExecuteErrors.SE_ERR_PNF:
-                        throw new DirectoryNotFoundException();
-                    case ShellExecuteErrors.SE_ERR_ACCESSDENIED:
-                        throw new UnauthorizedAccessException();
-                    case ShellExecuteErrors.SE_ERR_OOM:
-                        throw new OutOfMemoryException();
-                    case ShellExecuteErrors.SE_ERR_DLLNOTFOUND:
-                        throw new DllNotFoundException();
-                    default:
-                        throw new Win32Exception();
-                }
+                    ShellExecuteErrors.SE_ERR_FNF => new FileNotFoundException(),
+                    ShellExecuteErrors.SE_ERR_PNF => new DirectoryNotFoundException(),
+                    ShellExecuteErrors.SE_ERR_ACCESSDENIED => new UnauthorizedAccessException(),
+                    ShellExecuteErrors.SE_ERR_OOM => new OutOfMemoryException(),
+                    ShellExecuteErrors.SE_ERR_DLLNOTFOUND => new DllNotFoundException(),
+                    _ => new Win32Exception(),
+                };
             }
         }
     }

@@ -11,7 +11,7 @@ namespace SearchFile.Wpf.Module.Views.Converter
         {
             var paramEnum = ParseParameterEnum(value.GetType(), parameter);
 
-            if (paramEnum == null)
+            if (paramEnum is null)
             {
                 return DependencyProperty.UnsetValue;
             }
@@ -23,7 +23,7 @@ namespace SearchFile.Wpf.Module.Views.Converter
         {
             var paramEnum = ParseParameterEnum(targetType, parameter);
 
-            if (paramEnum == null || false.Equals(value))
+            if (paramEnum is null || value is false)
             {
                 return DependencyProperty.UnsetValue;
             }
@@ -31,9 +31,9 @@ namespace SearchFile.Wpf.Module.Views.Converter
             return paramEnum;
         }
 
-        private object? ParseParameterEnum(Type enumType, object parameter)
+        private static object? ParseParameterEnum(Type enumType, object parameter)
         {
-            if (!(parameter is string paramString) || !Enum.IsDefined(enumType, paramString))
+            if (parameter is not string paramString || !Enum.IsDefined(enumType, paramString))
             {
                 return null;
             }

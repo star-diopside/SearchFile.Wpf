@@ -10,12 +10,12 @@ namespace SearchFile.Wpf.Module.Views.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is bool ? !(bool)value : DependencyProperty.UnsetValue;
+            return value is bool boolean ? !boolean : DependencyProperty.UnsetValue;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is bool ? !(bool)value : DependencyProperty.UnsetValue;
+            return value is bool boolean ? !boolean : DependencyProperty.UnsetValue;
         }
     }
 }

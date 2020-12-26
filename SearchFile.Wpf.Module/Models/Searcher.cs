@@ -35,7 +35,7 @@ namespace SearchFile.Wpf.Module.Models
             _logger = logger;
 
             SearchingDirectory = _latestSearchingDirectory.ToReadOnlyReactiveProperty();
-            IsSearching = _cancellationTokenSource.Select(s => s != null).ToReadOnlyReactiveProperty();
+            IsSearching = _cancellationTokenSource.Select(s => s is not null).ToReadOnlyReactiveProperty();
             ExistsResults = Results.CollectionChangedAsObservable().Select(_ => Results.Any()).ToReadOnlyReactiveProperty();
         }
 

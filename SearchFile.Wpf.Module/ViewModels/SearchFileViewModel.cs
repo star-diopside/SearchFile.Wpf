@@ -99,7 +99,7 @@ namespace SearchFile.Wpf.Module.ViewModels
 
         private void SearchingDirectoryChanged(string? directory)
         {
-            if (directory == null)
+            if (directory is null)
             {
                 _latestStatus.Value = string.Format(Resources.SearchingResultMessage, _searcher.Results.Count);
             }
