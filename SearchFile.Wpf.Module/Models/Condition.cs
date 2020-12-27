@@ -12,7 +12,7 @@ namespace SearchFile.Wpf.Module.Models
     /// <summary>
     /// ファイル検索条件を表すクラス
     /// </summary>
-    public class Condition : BindableBase
+    public class Condition : BindableBase, ICondition
     {
         /// <summary>
         /// 検索対象ディレクトリを取得または設定する。
@@ -30,15 +30,6 @@ namespace SearchFile.Wpf.Module.Models
         /// 検索パターンを取得または設定する。
         /// </summary>
         public ReactiveProperty<FileNameMatchType> MatchType { get; } = new(FileNameMatchType.Wildcard);
-
-        /// <summary>
-        /// ファイル名検索パターン列挙子
-        /// </summary>
-        public enum FileNameMatchType
-        {
-            Wildcard,
-            Regex
-        }
 
         /// <summary>
         /// ファイル検索処理を取得する。

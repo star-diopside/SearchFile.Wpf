@@ -17,7 +17,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using Condition = SearchFile.Wpf.Module.Models.Condition;
 
 namespace SearchFile.Wpf.Module.ViewModels
 {
@@ -30,8 +29,8 @@ namespace SearchFile.Wpf.Module.ViewModels
         private readonly IChooseFolderService _chooseFolderService;
         private readonly IDeleteFileService _deleteFileService;
         private readonly ISaveFileService _saveFileService;
-        private readonly Condition _condition;
-        private readonly Searcher _searcher;
+        private readonly ICondition _condition;
+        private readonly ISearcher _searcher;
 
         private readonly CollectionViewSource _resultsViewSource;
         private readonly ReactiveProperty<string?> _latestStatus = new();
@@ -39,7 +38,7 @@ namespace SearchFile.Wpf.Module.ViewModels
 
         public ReactiveProperty<string?> TargetDirectory => _condition.TargetDirectory;
         public ReactiveProperty<string?> FileName => _condition.FileName;
-        public ReactiveProperty<Condition.FileNameMatchType> MatchType => _condition.MatchType;
+        public ReactiveProperty<FileNameMatchType> MatchType => _condition.MatchType;
         public ICollectionView ResultsView => _resultsViewSource.View;
         public ReadOnlyReactiveProperty<bool> IsSearching => _searcher.IsSearching;
         public ReadOnlyReactiveProperty<bool> ExistsResults => _searcher.ExistsResults;
@@ -64,8 +63,8 @@ namespace SearchFile.Wpf.Module.ViewModels
                                    IChooseFolderService chooseFolderService,
                                    IDeleteFileService deleteFileService,
                                    ISaveFileService saveFileService,
-                                   Condition condition,
-                                   Searcher searcher)
+                                   ICondition condition,
+                                   ISearcher searcher)
         {
             _logger = logger;
             _exceptionService = exceptionService;
@@ -184,10 +183,7 @@ namespace SearchFile.Wpf.Module.ViewModels
 
             if (_deleteFileService.DeleteFiles(results, RecyclesDeleteFiles.Value))
             {
-                foreach (var result in results)
-                {
-                    _searcher.Results.Remove(result);
-                }
+                _searcher.Remove(results);
                 _latestStatus.Value = string.Format(Resources.FileDeleteMessage, results.Count());
             }
             else

@@ -1,6 +1,7 @@
 ﻿using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
+using SearchFile.Wpf.Module.Models;
 using SearchFile.Wpf.Module.Services;
 using SearchFile.Wpf.Module.Views;
 
@@ -20,6 +21,8 @@ namespace SearchFile.Wpf.Module
             containerRegistry.RegisterSingleton<IChooseFolderService, ChooseFolderService>();
             containerRegistry.RegisterSingleton<IDeleteFileService, DeleteFileService>();
             containerRegistry.RegisterSingleton<ISaveFileService, SaveFileService>();
+            containerRegistry.Register<ICondition, Condition>();
+            containerRegistry.Register<ISearcher, Searcher>();
         }
     }
 }

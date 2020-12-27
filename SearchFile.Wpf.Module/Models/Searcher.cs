@@ -15,14 +15,15 @@ using System.Threading.Tasks;
 
 namespace SearchFile.Wpf.Module.Models
 {
-    public class Searcher : BindableBase
+    public class Searcher : BindableBase, ISearcher
     {
         private readonly ILogger<Searcher> _logger;
 
         private readonly ReactiveProperty<string?> _latestSearchingDirectory = new();
         private readonly ReactiveProperty<CancellationTokenSource?> _cancellationTokenSource = new();
+        private readonly ObservableCollection<Result> _results = new();
 
-        public ObservableCollection<Result> Results { get; } = new();
+        public ReadOnlyObservableCollection<Result> Results { get; }
 
         public ReadOnlyReactiveProperty<string?> SearchingDirectory { get; }
 
@@ -34,12 +35,13 @@ namespace SearchFile.Wpf.Module.Models
         {
             _logger = logger;
 
+            Results = new(_results);
             SearchingDirectory = _latestSearchingDirectory.ToReadOnlyReactiveProperty();
             IsSearching = _cancellationTokenSource.Select(s => s is not null).ToReadOnlyReactiveProperty();
             ExistsResults = Results.CollectionChangedAsObservable().Select(_ => Results.Any()).ToReadOnlyReactiveProperty();
         }
 
-        public async Task SearchAsync(Condition condition)
+        public async Task SearchAsync(ICondition condition)
         {
             if (IsSearching.Value || condition.TargetDirectory.Value is not string targetDirectory)
             {
@@ -47,9 +49,9 @@ namespace SearchFile.Wpf.Module.Models
             }
 
             var directoryProgress = new Progress<string>(directory => _latestSearchingDirectory.Value = directory);
-            var resultProgress = new Progress<Result>(Results.Add);
+            var resultProgress = new Progress<Result>(_results.Add);
 
-            Results.Clear();
+            _results.Clear();
 
             try
             {
@@ -104,7 +106,15 @@ namespace SearchFile.Wpf.Module.Models
 
         public void Clear()
         {
-            Results.Clear();
+            _results.Clear();
+        }
+
+        public void Remove(IEnumerable<Result> results)
+        {
+            foreach (var result in results)
+            {
+                _results.Remove(result);
+            }
         }
 
         public void Save(string fileName)
