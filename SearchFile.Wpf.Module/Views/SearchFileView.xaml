@@ -14,7 +14,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Resources/Image.xaml"/>
+                <ResourceDictionary Source="Image.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <LinearGradientBrush x:Key="ActiveCaptionBrush" StartPoint="0,0.5" EndPoint="1,0.5">
                 <GradientStop Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}"/>
