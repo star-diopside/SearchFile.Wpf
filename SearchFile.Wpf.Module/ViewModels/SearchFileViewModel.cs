@@ -12,6 +12,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -23,8 +24,6 @@ namespace SearchFile.Wpf.Module.ViewModels
 {
     public class SearchFileViewModel : BindableBase, IDisposable
     {
-        private readonly CompositeDisposable _disposable = new();
-
         private readonly ILogger<SearchFileViewModel> _logger;
         private readonly IExceptionService _exceptionService;
         private readonly IChooseFolderService _chooseFolderService;
@@ -33,18 +32,18 @@ namespace SearchFile.Wpf.Module.ViewModels
         private readonly ICondition _condition;
         private readonly ISearcher _searcher;
 
+        private readonly CompositeDisposable _disposable = new();
         private readonly CollectionViewSource _resultsViewSource;
-        private readonly ReactiveProperty<string?> _latestStatus = new();
+        private readonly ReactiveProperty<string?> _status = new();
         private readonly ReactiveProperty<bool> _isItemsSelected = new();
-
-        private CancellationTokenSource? _cancellationTokenSource;
+        private readonly ReactiveProperty<CancellationTokenSource?> _cancellationTokenSource = new();
 
         public ReactiveProperty<string?> TargetDirectory => _condition.TargetDirectory;
         public ReactiveProperty<string?> FileName => _condition.FileName;
         public ReactiveProperty<FileNameMatchType> MatchType => _condition.MatchType;
         public ICollectionView ResultsView => _resultsViewSource.View;
-        public ReadOnlyReactiveProperty<bool> IsSearching => _searcher.IsSearching;
-        public ReadOnlyReactiveProperty<bool> ExistsResults => _searcher.ExistsResults;
+        public ReadOnlyReactiveProperty<bool> IsSearching { get; }
+        public ReadOnlyReactiveProperty<bool> ExistsResults { get; }
         public ReactiveProperty<bool> AutoAdjustColumnWidth { get; } = new(true);
         public ReadOnlyReactiveProperty<string?> Status { get; }
         public ReactiveProperty<bool> RecyclesDeleteFiles { get; } = new(true);
@@ -80,6 +79,10 @@ namespace SearchFile.Wpf.Module.ViewModels
             _resultsViewSource = new() { Source = searcher.Results };
             _searcher.SearchingDirectory.Subscribe(SearchingDirectoryChanged).AddTo(_disposable);
 
+            IsSearching = _cancellationTokenSource.Select(s => s is not null).ToReadOnlyReactiveProperty();
+            ExistsResults = _searcher.Results.CollectionChangedAsObservable().Select(_ => _searcher.Results.Any()).ToReadOnlyReactiveProperty();
+            Status = _status.ToReadOnlyReactiveProperty();
+
             ResultsViewSelectionChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(ResultsViewSelectionChanged);
             ChooseFolderCommand = new DelegateCommand(ChooseFolder);
             SearchCommand = new DelegateCommand(Search);
@@ -91,7 +94,6 @@ namespace SearchFile.Wpf.Module.ViewModels
             CopyResultsCommand = ExistsResults.ToReactiveCommand().WithSubscribe(CopyResults).AddTo(_disposable);
             SortResultsCommand = new DelegateCommand<string>(SortResults);
             ShowPropertyCommand = _isItemsSelected.ToReactiveCommand().WithSubscribe(ShowProperty).AddTo(_disposable);
-            Status = _latestStatus.ToReadOnlyReactiveProperty();
         }
 
         public void Dispose()
@@ -103,11 +105,11 @@ namespace SearchFile.Wpf.Module.ViewModels
         {
             if (directory is null)
             {
-                _latestStatus.Value = string.Format(Resources.SearchingResultMessage, _searcher.Results.Count);
+                _status.Value = string.Format(Resources.SearchingResultMessage, _searcher.Results.Count);
             }
             else
             {
-                _latestStatus.Value = string.Format(Resources.SearchingDirectoryMessage, directory);
+                _status.Value = string.Format(Resources.SearchingDirectoryMessage, directory);
             }
         }
 
@@ -138,29 +140,28 @@ namespace SearchFile.Wpf.Module.ViewModels
 
         private async void Search()
         {
-            if (_cancellationTokenSource is null)
+            if (_cancellationTokenSource.Value is null)
             {
-                using (_cancellationTokenSource = new())
+                using var cancellation = (_cancellationTokenSource.Value = new());
+
+                try
                 {
-                    try
-                    {
-                        await _searcher.SearchAsync(_condition, _cancellationTokenSource.Token);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, ex.Message);
-                        _exceptionService.ShowDialog(ex);
-                        _latestStatus.Value = Resources.SearchingErrorMessage;
-                    }
-                    finally
-                    {
-                        _cancellationTokenSource = null;
-                    }
+                    await _searcher.SearchAsync(_condition, cancellation.Token);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, ex.Message);
+                    _exceptionService.ShowDialog(ex);
+                    _status.Value = Resources.SearchingErrorMessage;
+                }
+                finally
+                {
+                    _cancellationTokenSource.Value = null;
                 }
             }
             else
             {
-                _cancellationTokenSource.Cancel();
+                _cancellationTokenSource.Value.Cancel();
             }
         }
 
@@ -168,7 +169,7 @@ namespace SearchFile.Wpf.Module.ViewModels
         {
             _searcher.Clear();
             _resultsViewSource.SortDescriptions.Clear();
-            _latestStatus.Value = Resources.ClearResultsMessage;
+            _status.Value = Resources.ClearResultsMessage;
         }
 
         private void SelectAll()
@@ -194,11 +195,11 @@ namespace SearchFile.Wpf.Module.ViewModels
             if (_deleteFileService.DeleteFiles(results, RecyclesDeleteFiles.Value))
             {
                 _searcher.Remove(results);
-                _latestStatus.Value = string.Format(Resources.FileDeleteMessage, results.Count());
+                _status.Value = string.Format(Resources.FileDeleteMessage, results.Count());
             }
             else
             {
-                _latestStatus.Value = Resources.FileDeleteCancelMessage;
+                _status.Value = Resources.FileDeleteCancelMessage;
             }
         }
 
@@ -206,12 +207,9 @@ namespace SearchFile.Wpf.Module.ViewModels
         {
             try
             {
-                string? path = _saveFileService.SaveFile(new IFilter[]
-                {
-                    new CsvFileFilter(),
-                    new TextFileFilter(),
-                    new AllFileFilter()
-                });
+                string? path = _saveFileService.SaveFile(new CsvFileFilter(),
+                                                         new TextFileFilter(),
+                                                         new AllFileFilter());
 
                 if (path is not null)
                 {
@@ -235,7 +233,7 @@ namespace SearchFile.Wpf.Module.ViewModels
             }
 
             Clipboard.SetText(sb.ToString());
-            _latestStatus.Value = string.Format(Resources.CopyFileNameMessage, _searcher.Results.Count);
+            _status.Value = string.Format(Resources.CopyFileNameMessage, _searcher.Results.Count);
         }
 
         private void SortResults(string propertyName)

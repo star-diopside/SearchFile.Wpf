@@ -8,7 +8,7 @@ namespace SearchFile.Wpf.Module.Services
 {
     public class SaveFileService : ISaveFileService
     {
-        public string? SaveFile(ICollection<IFilter> filters)
+        public string? SaveFile(IEnumerable<IFilter> filters)
         {
             var dialog = new SaveFileDialog()
             {

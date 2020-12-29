@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Prism.Mvvm;
 using Reactive.Bindings;
-using Reactive.Bindings.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,43 +18,35 @@ namespace SearchFile.Wpf.Module.Models
     {
         private readonly ILogger<Searcher> _logger;
 
-        private readonly ReactiveProperty<string?> _latestSearchingDirectory = new();
-        private readonly ReactiveProperty<bool> _isSearching = new();
         private readonly ObservableCollection<Result> _results = new();
+        private readonly ReactiveProperty<string?> _searchingDirectory = new();
 
         public ReadOnlyObservableCollection<Result> Results { get; }
 
         public ReadOnlyReactiveProperty<string?> SearchingDirectory { get; }
-
-        public ReadOnlyReactiveProperty<bool> IsSearching { get; }
-
-        public ReadOnlyReactiveProperty<bool> ExistsResults { get; }
 
         public Searcher(ILogger<Searcher> logger)
         {
             _logger = logger;
 
             Results = new(_results);
-            SearchingDirectory = _latestSearchingDirectory.ToReadOnlyReactiveProperty();
-            IsSearching = _isSearching.ToReadOnlyReactiveProperty();
-            ExistsResults = Results.CollectionChangedAsObservable().Select(_ => Results.Any()).ToReadOnlyReactiveProperty();
+            SearchingDirectory = _searchingDirectory.ToReadOnlyReactiveProperty();
         }
 
         public async Task SearchAsync(ICondition condition, CancellationToken cancellationToken = default)
         {
-            if (IsSearching.Value || condition.TargetDirectory.Value is not string targetDirectory)
+            if (condition.TargetDirectory.Value is not string targetDirectory)
             {
                 throw new InvalidOperationException();
             }
 
-            var directoryProgress = new Progress<string>(directory => _latestSearchingDirectory.Value = directory);
+            var directoryProgress = new Progress<string>(directory => _searchingDirectory.Value = directory);
             var resultProgress = new Progress<IEnumerable<Result>>(results => _results.AddRange(results));
 
             _results.Clear();
 
             try
             {
-                _isSearching.Value = true;
                 await Task.Run(() => Search(targetDirectory, condition.GetSearchFileStrategy(),
                     directoryProgress, resultProgress, cancellationToken), cancellationToken);
             }
@@ -63,12 +54,8 @@ namespace SearchFile.Wpf.Module.Models
             {
                 _logger.LogDebug(ex, ex.Message);
             }
-            finally
-            {
-                _isSearching.Value = false;
-            }
 
-            _latestSearchingDirectory.Value = null;
+            _searchingDirectory.Value = null;
         }
 
         private void Search(string path, Func<string, IEnumerable<string>> strategy,

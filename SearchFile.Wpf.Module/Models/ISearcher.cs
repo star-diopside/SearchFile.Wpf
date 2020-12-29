@@ -22,16 +22,6 @@ namespace SearchFile.Wpf.Module.Models
         ReadOnlyReactiveProperty<string?> SearchingDirectory { get; }
 
         /// <summary>
-        /// 検索中かどうかを示す読み取り専用プロパティを取得する。
-        /// </summary>
-        ReadOnlyReactiveProperty<bool> IsSearching { get; }
-
-        /// <summary>
-        /// 検索結果が存在するかどうかを示す読み取り専用プロパティを取得する。
-        /// </summary>
-        ReadOnlyReactiveProperty<bool> ExistsResults { get; }
-
-        /// <summary>
         /// 検索処理を行う。
         /// </summary>
         /// <param name="condition">検索条件を表すオブジェクト</param>

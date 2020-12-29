@@ -1,10 +1,13 @@
 ﻿using SearchFile.Wpf.Module.Services.FileFilters;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SearchFile.Wpf.Module.Services
 {
     public interface ISaveFileService
     {
-        string? SaveFile(ICollection<IFilter> filters);
+        string? SaveFile(IEnumerable<IFilter> filters);
+
+        string? SaveFile(params IFilter[] filters) => SaveFile(filters.AsEnumerable());
     }
 }
