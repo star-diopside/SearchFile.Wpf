@@ -1,6 +1,7 @@
 ﻿using Reactive.Bindings;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SearchFile.Wpf.Module.Models
@@ -34,13 +35,9 @@ namespace SearchFile.Wpf.Module.Models
         /// 検索処理を行う。
         /// </summary>
         /// <param name="condition">検索条件を表すオブジェクト</param>
+        /// <param name="cancellationToken">非同期処理のキャンセル通知を行うためのキャンセルトークン</param>
         /// <returns>非同期操作を表すタスクオブジェクト</returns>
-        Task SearchAsync(ICondition condition);
-
-        /// <summary>
-        /// 検索処理をキャンセルする。
-        /// </summary>
-        void Cancel();
+        Task SearchAsync(ICondition condition, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// 検索結果をクリアする。

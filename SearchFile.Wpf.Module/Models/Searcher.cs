@@ -20,7 +20,7 @@ namespace SearchFile.Wpf.Module.Models
         private readonly ILogger<Searcher> _logger;
 
         private readonly ReactiveProperty<string?> _latestSearchingDirectory = new();
-        private readonly ReactiveProperty<CancellationTokenSource?> _cancellationTokenSource = new();
+        private readonly ReactiveProperty<bool> _isSearching = new();
         private readonly ObservableCollection<Result> _results = new();
 
         public ReadOnlyObservableCollection<Result> Results { get; }
@@ -37,11 +37,11 @@ namespace SearchFile.Wpf.Module.Models
 
             Results = new(_results);
             SearchingDirectory = _latestSearchingDirectory.ToReadOnlyReactiveProperty();
-            IsSearching = _cancellationTokenSource.Select(s => s is not null).ToReadOnlyReactiveProperty();
+            IsSearching = _isSearching.ToReadOnlyReactiveProperty();
             ExistsResults = Results.CollectionChangedAsObservable().Select(_ => Results.Any()).ToReadOnlyReactiveProperty();
         }
 
-        public async Task SearchAsync(ICondition condition)
+        public async Task SearchAsync(ICondition condition, CancellationToken cancellationToken = default)
         {
             if (IsSearching.Value || condition.TargetDirectory.Value is not string targetDirectory)
             {
@@ -55,12 +55,9 @@ namespace SearchFile.Wpf.Module.Models
 
             try
             {
-                using (_cancellationTokenSource.Value = new())
-                {
-                    var token = _cancellationTokenSource.Value.Token;
-                    await Task.Run(() => Search(targetDirectory, condition.GetSearchFileStrategy(),
-                        directoryProgress, resultProgress, token), token);
-                }
+                _isSearching.Value = true;
+                await Task.Run(() => Search(targetDirectory, condition.GetSearchFileStrategy(),
+                    directoryProgress, resultProgress, cancellationToken), cancellationToken);
             }
             catch (OperationCanceledException ex)
             {
@@ -68,7 +65,7 @@ namespace SearchFile.Wpf.Module.Models
             }
             finally
             {
-                _cancellationTokenSource.Value = null;
+                _isSearching.Value = false;
             }
 
             _latestSearchingDirectory.Value = null;
@@ -82,8 +79,7 @@ namespace SearchFile.Wpf.Module.Models
 
             try
             {
-                var results = from file in strategy(path) select new Result(file);
-                foreach (var result in results)
+                foreach (var result in strategy(path).Select(file => new Result(file)))
                 {
                     resultProgress.Report(result);
                 }
@@ -93,15 +89,10 @@ namespace SearchFile.Wpf.Module.Models
                     Search(directory, strategy, directoryProgress, resultProgress, token);
                 }
             }
-            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
                 _logger.LogDebug(ex, ex.Message);
             }
-        }
-
-        public void Cancel()
-        {
-            _cancellationTokenSource.Value?.Cancel();
         }
 
         public void Clear()

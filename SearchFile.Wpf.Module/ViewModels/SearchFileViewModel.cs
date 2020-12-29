@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -35,6 +36,8 @@ namespace SearchFile.Wpf.Module.ViewModels
         private readonly CollectionViewSource _resultsViewSource;
         private readonly ReactiveProperty<string?> _latestStatus = new();
         private readonly ReactiveProperty<bool> _isItemsSelected = new();
+
+        private CancellationTokenSource? _cancellationTokenSource;
 
         public ReactiveProperty<string?> TargetDirectory => _condition.TargetDirectory;
         public ReactiveProperty<string?> FileName => _condition.FileName;
@@ -135,22 +138,29 @@ namespace SearchFile.Wpf.Module.ViewModels
 
         private async void Search()
         {
-            try
+            if (_cancellationTokenSource is null)
             {
-                if (_searcher.IsSearching.Value)
+                using (_cancellationTokenSource = new())
                 {
-                    _searcher.Cancel();
-                }
-                else
-                {
-                    await _searcher.SearchAsync(_condition);
+                    try
+                    {
+                        await _searcher.SearchAsync(_condition, _cancellationTokenSource.Token);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, ex.Message);
+                        _exceptionService.ShowDialog(ex);
+                        _latestStatus.Value = Resources.SearchingErrorMessage;
+                    }
+                    finally
+                    {
+                        _cancellationTokenSource = null;
+                    }
                 }
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError(ex, ex.Message);
-                _exceptionService.ShowDialog(ex);
-                _latestStatus.Value = Resources.SearchingErrorMessage;
+                _cancellationTokenSource.Cancel();
             }
         }
 
