@@ -24,12 +24,12 @@ namespace SearchFile.Wpf.Module.Models
         /// <summary>
         /// ファイル名を取得する。
         /// </summary>
-        public string? FileName => Path.GetFileName(FilePath);
+        public string FileName => Path.GetFileName(FilePath);
 
         /// <summary>
         /// 拡張子を取得する。
         /// </summary>
-        public string? Extension => Path.GetExtension(FilePath);
+        public string Extension => Path.GetExtension(FilePath);
 
         /// <summary>
         /// ディレクトリ名を取得する。

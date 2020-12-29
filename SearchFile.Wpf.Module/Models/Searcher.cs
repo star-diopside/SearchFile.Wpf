@@ -49,7 +49,7 @@ namespace SearchFile.Wpf.Module.Models
             }
 
             var directoryProgress = new Progress<string>(directory => _latestSearchingDirectory.Value = directory);
-            var resultProgress = new Progress<Result>(_results.Add);
+            var resultProgress = new Progress<IEnumerable<Result>>(results => _results.AddRange(results));
 
             _results.Clear();
 
@@ -72,16 +72,17 @@ namespace SearchFile.Wpf.Module.Models
         }
 
         private void Search(string path, Func<string, IEnumerable<string>> strategy,
-            IProgress<string> directoryProgress, IProgress<Result> resultProgress, CancellationToken token)
+            IProgress<string> directoryProgress, IProgress<IEnumerable<Result>> resultProgress, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             directoryProgress.Report(path);
 
             try
             {
-                foreach (var result in strategy(path).Select(file => new Result(file)))
+                var results = strategy(path).Select(file => new Result(file));
+                if (results.Any())
                 {
-                    resultProgress.Report(result);
+                    resultProgress.Report(results);
                 }
 
                 foreach (var directory in Directory.EnumerateDirectories(path))
