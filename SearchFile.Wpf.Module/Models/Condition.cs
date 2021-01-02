@@ -1,6 +1,5 @@
 ﻿using Prism.Mvvm;
 using Reactive.Bindings;
-using SearchFile.Wpf.Module.Properties;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,13 +13,12 @@ namespace SearchFile.Wpf.Module.Models
     /// </summary>
     public class Condition : BindableBase, ICondition
     {
-        public ReactiveProperty<string?> TargetDirectory { get; } = new ReactiveProperty<string?>(
-            Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System))
-        ).SetValidateNotifyError(dir => Directory.Exists(dir) ? null : Resources.DirectoryNotFoundMessage);
+        public ReactivePropertySlim<string?> TargetDirectory { get; } = new(
+            Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)));
 
-        public ReactiveProperty<string?> FileName { get; } = new();
+        public ReactivePropertySlim<string?> FileName { get; } = new();
 
-        public ReactiveProperty<FileNameMatchType> MatchType { get; } = new(FileNameMatchType.Wildcard);
+        public ReactivePropertySlim<FileNameMatchType> MatchType { get; } = new(FileNameMatchType.Wildcard);
 
         public Func<string, IEnumerable<string>> GetSearchFileStrategy()
         {

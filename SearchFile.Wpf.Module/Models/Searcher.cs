@@ -19,18 +19,18 @@ namespace SearchFile.Wpf.Module.Models
         private readonly ILogger<Searcher> _logger;
 
         private readonly ObservableCollection<Result> _results = new();
-        private readonly ReactiveProperty<string?> _searchingDirectory = new();
+        private readonly ReactivePropertySlim<string?> _searchingDirectory = new();
 
         public ReadOnlyObservableCollection<Result> Results { get; }
 
-        public ReadOnlyReactiveProperty<string?> SearchingDirectory { get; }
+        public ReadOnlyReactivePropertySlim<string?> SearchingDirectory { get; }
 
         public Searcher(ILogger<Searcher> logger)
         {
             _logger = logger;
 
             Results = new(_results);
-            SearchingDirectory = _searchingDirectory.ToReadOnlyReactiveProperty();
+            SearchingDirectory = _searchingDirectory.ToReadOnlyReactivePropertySlim();
         }
 
         public async Task SearchAsync(ICondition condition, CancellationToken cancellationToken = default)

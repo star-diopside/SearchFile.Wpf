@@ -19,7 +19,7 @@ namespace SearchFile.Wpf.Module.Models
         /// <summary>
         /// 検索中ディレクトリの読み取り専用プロパティを取得する。
         /// </summary>
-        ReadOnlyReactiveProperty<string?> SearchingDirectory { get; }
+        ReadOnlyReactivePropertySlim<string?> SearchingDirectory { get; }
 
         /// <summary>
         /// 検索処理を行う。

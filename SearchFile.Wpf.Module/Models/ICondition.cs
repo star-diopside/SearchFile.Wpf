@@ -12,17 +12,17 @@ namespace SearchFile.Wpf.Module.Models
         /// <summary>
         /// 検索対象ディレクトリを表すプロパティを取得する。
         /// </summary>
-        ReactiveProperty<string?> TargetDirectory { get; }
+        ReactivePropertySlim<string?> TargetDirectory { get; }
 
         /// <summary>
         /// 検索ファイル名を表すプロパティを取得する。
         /// </summary>
-        ReactiveProperty<string?> FileName { get; }
+        ReactivePropertySlim<string?> FileName { get; }
 
         /// <summary>
         /// 検索パターンを表すプロパティを取得する。
         /// </summary>
-        ReactiveProperty<FileNameMatchType> MatchType { get; }
+        ReactivePropertySlim<FileNameMatchType> MatchType { get; }
 
         /// <summary>
         /// ファイル検索処理を取得する。

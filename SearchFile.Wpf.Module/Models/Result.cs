@@ -14,7 +14,7 @@ namespace SearchFile.Wpf.Module.Models
         /// <summary>
         /// リスト項目が選択されているかどうかを示す値を取得または設定する。
         /// </summary>
-        public ReactiveProperty<bool> IsSelected { get; } = new();
+        public ReactivePropertySlim<bool> IsSelected { get; } = new();
 
         /// <summary>
         /// ファイルパスを取得する。

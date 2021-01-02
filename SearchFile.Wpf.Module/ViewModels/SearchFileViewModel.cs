@@ -10,6 +10,7 @@ using SearchFile.Wpf.Module.Services.FileFilters;
 using SearchFile.Wpf.Module.Shell;
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -34,19 +35,19 @@ namespace SearchFile.Wpf.Module.ViewModels
 
         private readonly CompositeDisposable _disposable = new();
         private readonly CollectionViewSource _resultsViewSource;
-        private readonly ReactiveProperty<string?> _status = new();
-        private readonly ReactiveProperty<bool> _isItemsSelected = new();
-        private readonly ReactiveProperty<CancellationTokenSource?> _cancellationTokenSource = new();
+        private readonly ReactivePropertySlim<string?> _status = new();
+        private readonly ReactivePropertySlim<bool> _isItemsSelected = new();
+        private readonly ReactivePropertySlim<CancellationTokenSource?> _cancellationTokenSource = new();
 
-        public ReactiveProperty<string?> TargetDirectory => _condition.TargetDirectory;
-        public ReactiveProperty<string?> FileName => _condition.FileName;
-        public ReactiveProperty<FileNameMatchType> MatchType => _condition.MatchType;
+        public ReactiveProperty<string?> TargetDirectory { get; }
+        public ReactivePropertySlim<string?> FileName => _condition.FileName;
+        public ReactivePropertySlim<FileNameMatchType> MatchType => _condition.MatchType;
         public ICollectionView ResultsView => _resultsViewSource.View;
-        public ReadOnlyReactiveProperty<bool> IsSearching { get; }
-        public ReadOnlyReactiveProperty<bool> ExistsResults { get; }
-        public ReactiveProperty<bool> AutoAdjustColumnWidth { get; } = new(true);
-        public ReadOnlyReactiveProperty<string?> Status { get; }
-        public ReactiveProperty<bool> RecyclesDeleteFiles { get; } = new(true);
+        public ReadOnlyReactivePropertySlim<bool> IsSearching { get; }
+        public ReadOnlyReactivePropertySlim<bool> ExistsResults { get; }
+        public ReactivePropertySlim<bool> AutoAdjustColumnWidth { get; } = new(true);
+        public ReadOnlyReactivePropertySlim<string?> Status { get; }
+        public ReactivePropertySlim<bool> RecyclesDeleteFiles { get; } = new(true);
 
         public ICommand ResultsViewSelectionChangedCommand { get; }
         public ICommand ChooseFolderCommand { get; }
@@ -79,13 +80,16 @@ namespace SearchFile.Wpf.Module.ViewModels
             _resultsViewSource = new() { Source = searcher.Results };
             _searcher.SearchingDirectory.Subscribe(SearchingDirectoryChanged).AddTo(_disposable);
 
-            IsSearching = _cancellationTokenSource.Select(s => s is not null).ToReadOnlyReactiveProperty();
-            ExistsResults = _searcher.Results.CollectionChangedAsObservable().Select(_ => _searcher.Results.Any()).ToReadOnlyReactiveProperty();
-            Status = _status.ToReadOnlyReactiveProperty();
+            TargetDirectory = _condition.TargetDirectory.ToReactiveProperty()
+                .SetValidateNotifyError(dir => Directory.Exists(dir) ? null : Resources.DirectoryNotFoundMessage);
+            IsSearching = _cancellationTokenSource.Select(s => s is not null).ToReadOnlyReactivePropertySlim();
+            ExistsResults = _searcher.Results.CollectionChangedAsObservable().Select(_ => _searcher.Results.Any()).ToReadOnlyReactivePropertySlim();
+            Status = _status.ToReadOnlyReactivePropertySlim();
 
             ResultsViewSelectionChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(ResultsViewSelectionChanged);
             ChooseFolderCommand = new DelegateCommand(ChooseFolder);
-            SearchCommand = new DelegateCommand(Search);
+            SearchCommand = TargetDirectory.ObserveHasErrors.Inverse().CombineLatest(IsSearching, (x, y) => x || y)
+                .ToReactiveCommand().WithSubscribe(Search).AddTo(_disposable);
             ClearResultsCommand = IsSearching.Inverse().ToReactiveCommand().WithSubscribe(ClearResults).AddTo(_disposable);
             SelectAllCommand = ExistsResults.ToReactiveCommand().WithSubscribe(SelectAll).AddTo(_disposable);
             ReverseSelectionCommand = ExistsResults.ToReactiveCommand().WithSubscribe(ReverseSelection).AddTo(_disposable);
