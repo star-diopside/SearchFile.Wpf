@@ -14,7 +14,8 @@ namespace SearchFile.Wpf.Module.Models
     public class Condition : BindableBase, ICondition
     {
         public ReactivePropertySlim<string?> TargetDirectory { get; } = new(
-            Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)));
+            initialValue: Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)),
+            mode: ReactivePropertyMode.Default & ~ReactivePropertyMode.DistinctUntilChanged);
 
         public ReactivePropertySlim<string?> FileName { get; } = new();
 
