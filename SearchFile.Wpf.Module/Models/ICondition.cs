@@ -25,6 +25,16 @@ namespace SearchFile.Wpf.Module.Models
         ReactivePropertySlim<FileNameMatchType> MatchType { get; }
 
         /// <summary>
+        /// 検索結果にファイル名を含むかどうかを示すプロパティを取得する。
+        /// </summary>
+        ReactivePropertySlim<bool> IsMatchFile { get; }
+
+        /// <summary>
+        /// 検索結果にディレクトリ名を含むかどうかを示すプロパティを取得する。
+        /// </summary>
+        ReactivePropertySlim<bool> IsMatchDirectory { get; }
+
+        /// <summary>
         /// ファイル検索処理を取得する。
         /// </summary>
         /// <returns>指定されたディレクトリのファイル一覧を返すデリゲート</returns>

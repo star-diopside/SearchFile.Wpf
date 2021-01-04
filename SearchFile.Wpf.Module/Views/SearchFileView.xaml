@@ -124,7 +124,7 @@
                 <ColumnDefinition Width="300" MinWidth="300"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition/>
+                <RowDefinition Height="1.5*"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
@@ -198,12 +198,20 @@
                     <TextBox x:Name="directoryName" Margin="8,0" Text="{Binding TargetDirectory.Value, UpdateSourceTrigger=PropertyChanged}"/>
                     <Button Content="ディレクトリの選択" Margin="8" HorizontalAlignment="Right" IsDefault="{Binding IsFocused, ElementName=directoryName, Mode=OneWay}" Command="{Binding ChooseFolderCommand, Mode=OneWay}"/>
                     <Label Content="ファイル名(_F):" Target="{Binding ElementName=fileName, Mode=OneWay}" Padding="0" Margin="8,0"/>
-                    <TextBox x:Name="fileName" Margin="8,0,8,8" Text="{Binding FileName.Value, UpdateSourceTrigger=PropertyChanged}"/>
-                    <StackPanel Orientation="Horizontal" Margin="8,0" HorizontalAlignment="Center">
-                        <RadioButton Content="ワイルドカード" Margin="8,0" HorizontalAlignment="Center" IsChecked="{Binding MatchType.Value, ConverterParameter=Wildcard, Converter={StaticResource EnumBooleanConverter}}"/>
-                        <RadioButton Content="正規表現" Margin="8,0" HorizontalAlignment="Center" IsChecked="{Binding MatchType.Value, ConverterParameter=Regex, Converter={StaticResource EnumBooleanConverter}}"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="8,16,8,0" HorizontalAlignment="Right">
+                    <TextBox x:Name="fileName" Margin="8,0,8,4" Text="{Binding FileName.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                    <GroupBox Header="検索パターン" Margin="8,0" Padding="0,4">
+                        <StackPanel Orientation="Horizontal" Margin="8,0" HorizontalAlignment="Center">
+                            <RadioButton Content="ワイルドカード" Margin="8,0" HorizontalAlignment="Center" IsChecked="{Binding MatchType.Value, ConverterParameter=Wildcard, Converter={StaticResource EnumBooleanConverter}}"/>
+                            <RadioButton Content="正規表現" Margin="8,0" HorizontalAlignment="Center" IsChecked="{Binding MatchType.Value, ConverterParameter=Regex, Converter={StaticResource EnumBooleanConverter}}"/>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Header="検索対象" Margin="8,0" Padding="0,4">
+                        <StackPanel Orientation="Horizontal" Margin="8,0" HorizontalAlignment="Center">
+                            <CheckBox Content="ファイル" Margin="8,0" IsChecked="{Binding IsMatchFile.Value}"/>
+                            <CheckBox Content="ディレクトリ" Margin="8,0" IsChecked="{Binding IsMatchDirectory.Value}"/>
+                        </StackPanel>
+                    </GroupBox>
+                    <StackPanel Orientation="Horizontal" Margin="8,8,8,0" HorizontalAlignment="Right">
                         <Button IsDefault="{Binding IsFocused, Converter={StaticResource BooleanNegationConverter}, ElementName=directoryName, Mode=OneWay}" Command="{Binding SearchCommand, Mode=OneWay}">
                             <Button.Style>
                                 <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">

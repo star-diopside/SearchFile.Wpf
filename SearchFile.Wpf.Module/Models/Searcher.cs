@@ -66,10 +66,10 @@ namespace SearchFile.Wpf.Module.Models
 
             try
             {
-                var results = strategy(path).Select(file => new Result(file));
-                if (results.Any())
+                var files = strategy(path);
+                if (files.Any())
                 {
-                    resultProgress.Report(results);
+                    resultProgress.Report(files.Select(file => new Result(file)));
                 }
 
                 foreach (var directory in Directory.EnumerateDirectories(path))

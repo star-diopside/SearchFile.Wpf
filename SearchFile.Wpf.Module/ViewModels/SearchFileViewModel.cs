@@ -42,6 +42,8 @@ namespace SearchFile.Wpf.Module.ViewModels
         public ReactiveProperty<string?> TargetDirectory { get; }
         public ReactivePropertySlim<string?> FileName => _condition.FileName;
         public ReactivePropertySlim<FileNameMatchType> MatchType => _condition.MatchType;
+        public ReactivePropertySlim<bool> IsMatchFile => _condition.IsMatchFile;
+        public ReactivePropertySlim<bool> IsMatchDirectory => _condition.IsMatchDirectory;
         public ICollectionView ResultsView => _resultsViewSource.View;
         public ReadOnlyReactivePropertySlim<bool> IsSearching { get; }
         public ReadOnlyReactivePropertySlim<bool> ExistsResults { get; }
